@@ -150,9 +150,9 @@ export const handleSkipOption = async (
  * @returns {string|null} - A formatted comment string if the error type merits a comment in the PR; otherwise, null.
  *
  */
-export const getErrorComment = (errorInput) => {
+export const getErrorComment = (errorInput, formatErrorMessage) => {
   if (errorInput.shouldResultInPRComment) {
-    return `${errorInput.name}: ${errorInput.message}`;
+    return formatErrorMessage(errorInput);
   }
   return null;
 };
@@ -173,9 +173,10 @@ export const postPRComment = async (
   repo,
   prNumber,
   errorInput,
-  getErrorComment
+  getErrorComment,
+  formatErrorMessage
 ) => {
-  const comment = getErrorComment(errorInput);
+  const comment = getErrorComment(errorInput, formatErrorMessage);
 
   if (comment) {
     try {

@@ -8,6 +8,7 @@ import {
   prepareChangelogEntry,
   prepareChangelogEntriesMap,
   prepareChangesetEntriesContent,
+  formatErrorMessage
 } from "../utils/formattingUtils.js";
 import {
   extractPullRequestData,
@@ -114,7 +115,8 @@ export const create_or_update_changeset = async (ghApp, octokit, payload) => {
           repo,
           prNumber,
           error,
-          getErrorComment
+          getErrorComment,
+          formatErrorMessage
         );
         await updatePRLabel(
           octokit,
