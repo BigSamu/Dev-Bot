@@ -79,6 +79,7 @@ export const extractChangelogEntries = (prDescription, processLine) => {
       changelogEntries.length === 1 ? "entry" : "entries"
     }.`
   );
+  console.log(changelogEntries)
 
   return changelogEntries;
 };
