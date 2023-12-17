@@ -215,13 +215,13 @@ export const createOrUpdateFile = async (
   octokit,
   owner,
   repo,
+  branchRef,
+  prNumber,
   path,
-  content,
-  message,
-  branchRef
+  content
 ) => {
   // File's SHA to check if file exists
-  let sha;
+  let sha, message;
   // Attempt to retrieve the file's SHA to check if it exists
   try {
     const response = await octokit.rest.repos.getContent({
@@ -231,13 +231,12 @@ export const createOrUpdateFile = async (
       ref: branchRef,
     });
     sha = response.data.sha;
+    message = `${sha ? "update" : "create"} changeset file ${prNumber}.yml for PR #${prNumber}`;
+
   } catch (error) {
     if (error.status === 404) {
       console.log("Changeset file not found. Proceeding to create a new one.");
     } else {
-      console.log(" ---------------- ERROR -------------------");
-      console.log(error);
-      console.log(" ------------------------------------------");
       throw new GetGithubContentError();
     }
   }
@@ -255,20 +254,6 @@ export const createOrUpdateFile = async (
     });
     console.log(`File: ${path} ${sha ? "updated" : "created"} successfully.`);
   } catch (error) {
-    console.log(" ---------------- DETAILS -----------------");
-    console.log("owner:", owner);
-    console.log("repo:", repo);
-    console.log("path:", path);
-    console.log("message:", message);
-    console.log("content:", content);
-    console.log("sha:", sha);
-    console.log("branchRef:", branchRef);
-    console.log(" ------------------------------------------");
-
-    console.log(" ---------------- ERROR -------------------");
-    console.log(error);
-    console.log(" ------------------------------------------");
-
     if (!sha) {
       throw new CreateChangesetFileError();
     } else {
