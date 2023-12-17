@@ -85,7 +85,7 @@ export const create_or_update_changeset = async (ghApp, octokit, payload) => {
     const changesetFileName = `${prNumber}.yml`;
     const changesetFilePath = `${CHANGESET_PATH}/${changesetFileName}`;
 
-    const forkOwnerOcktokit = await getOcktokitClient(ghApp, prOwner, prRepo);
+    const forkOwnerOcktokit = getOcktokitClient(ghApp, prOwner, prRepo);
     // Create or update the changeset file using Github API
     await createOrUpdateFile(
       forkOwnerOcktokit,
@@ -106,6 +106,7 @@ export const create_or_update_changeset = async (ghApp, octokit, payload) => {
     );
   } catch (error) {
     if (error.response) {
+      console.log(error)
       console.error(
         `Error! Status: ${error.response.status}. Message: ${error.response.data.message}`
       );
