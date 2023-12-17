@@ -43,7 +43,7 @@ export const prepareChangelogEntry = (changelogEntry, prNumber, prLink) => {
       }
       else if (!text) {
         throw new EmptyEntryDescriptionError(prefix);
-      } 
+      }
       else if (trimmedText.length > MAX_ENTRY_LENGTH) {
         throw new EntryTooLongError(text.length);
       }
@@ -95,4 +95,26 @@ export const prepareChangesetEntriesContent = (changelogEntriesMap) => {
       return `${prefix}:\n${entries.join("\n")}`;
     })
     .join("\n\n");
+};
+
+/**
+ * Formats an error message with specific styling and returns it as an HTML string.
+ * It transforms the PascalCase 'name' of the error to spaced string, makes it bold,
+ * prefixes it with a cross mark emoji, and places the 'message' in a paragraph.
+ *
+ * @param {Object} inputError - The error object to format.
+ * @param {string} inputError.name - The PascalCase name of the error.
+ * @param {string} inputError.message - The descriptive message of the error.
+ * @returns {string} Formatted error message as an HTML string.
+ *
+
+ */
+const formatErrorMessage = (inputError) => {
+  const spacedName = inputError.name.replace(/([A-Z])/g, ' $1').trim();
+  return `
+    <div>
+      <strong>❌ ${spacedName}</strong>
+      <p>${inputError.message}</p>
+    </div>
+  `;
 };
