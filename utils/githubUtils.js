@@ -231,8 +231,9 @@ export const createOrUpdateFile = async (
       ref: branchRef,
     });
     sha = response.data.sha;
-    message = `${sha ? "update" : "create"} changeset file ${prNumber}.yml for PR #${prNumber}`;
-
+    message = `${
+      sha ? "update" : "create"
+    } changeset file ${prNumber}.yml for PR #${prNumber}`;
   } catch (error) {
     if (error.status === 404) {
       console.log("Changeset file not found. Proceeding to create a new one.");
@@ -264,10 +265,13 @@ export const createOrUpdateFile = async (
 
 /**
  * Creates an authenticated Octokit instance for a given GitHub App installation.
+ * This function performs asynchronous operations to obtain the installation ID and
+ * then returns a Promise that resolves to an authenticated Octokit instance for that installation.
  *
  * @param {App} ghApp - The GitHub App instance.
- * @param {Object} payload - The webhook event payload.
- * @returns {Octokit} An authenticated Octokit instance.
+ * @param {string} owner - The owner of the repository.
+ * @param {string} repo - The repository name.
+ * @returns {Promise<Octokit>} A Promise that resolves to an authenticated Octokit instance.
  */
 export const getOcktokitClient = async (ghApp, owner, repo) => {
   const { data: installation } = await ghApp.octokit.request(
