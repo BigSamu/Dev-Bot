@@ -111,9 +111,9 @@ export const prepareChangesetEntriesContent = (changelogEntriesMap) => {
  */
 export const formatErrorMessage = (inputError) => {
   const spacedName = inputError.name.replace(/([A-Z])/g, ' $1').trim();
-  return `
-    ### ❌ ${spacedName}
-
-    ${inputError.message}
-  `;
+  const outputErrorMessage =
+    `### ❌ ${spacedName}\n`+
+    "\n"+
+    `${inputError.message}\n`
+  return outputErrorMessage;
 };
