@@ -1,4 +1,5 @@
-import github from "@actions/github";
+import { Octokit } from "octokit";
+
 import {
   PullRequestDataExtractionError,
   GetGithubContentError,
@@ -17,7 +18,6 @@ import { SKIP_LABEL } from "../config/constants.js";
  */
 export const extractPullRequestData = (pr_payload) => {
   try {
-
     console.log(
       `Extracting data for PR #${pr_payload.number} in ${pr_payload.base.repo.owner.login}/${pr_payload.base.repo.name}`
     );
@@ -275,4 +275,19 @@ export const createOrUpdateFile = async (
       throw new UpdateChangesetFileError();
     }
   }
+};
+
+/**
+ * Creates an authenticated Octokit instance for a given GitHub App installation.
+ *
+ * @param {App} ghApp - The GitHub App instance.
+ * @param {Object} payload - The webhook event payload.
+ * @returns {Octokit} An authenticated Octokit instance.
+ */
+export const getOcktokitClient = async (ghApp, owner, repo) => {
+  const { data: installation } = await ghApp.octokit.request(
+    `GET /repos/{owner}/{repo}/installation`,
+    { owner, repo }
+  );
+  return ghApp.getInstallationOctokit(installation.id);
 };

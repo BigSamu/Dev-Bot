@@ -1,18 +1,14 @@
 // Webhook handling logic
-import {
-  CHANGESET_PATH,
-  GITHUB_TOKEN,
-  FAILED_CHANGESET_LABEL,
-} from "./config/constants.js";
+import { CHANGESET_PATH, FAILED_CHANGESET_LABEL } from "./constants.js";
 import {
   processLine,
   extractChangelogEntries,
-} from "./utils/changelogParser.js";
+} from "../utils/changelogParser.js";
 import {
   prepareChangelogEntry,
   prepareChangelogEntriesMap,
   prepareChangesetEntriesContent,
-} from "./utils/formattingUtils.js";
+} from "../utils/formattingUtils.js";
 import {
   extractPullRequestData,
   createOrUpdateFile,
@@ -20,17 +16,29 @@ import {
   handleSkipOption,
   postPRComment,
   getErrorComment,
-} from "./utils/githubUtils.js";
+  getOcktokitClient,
+} from "../utils/githubUtils.js";
 
 const setupWebhooks = (ghApp) => {
-  ghApp.webhooks.on("pull_request.opened", async ({ octokit, payload }) => {
+  ghApp.webhooks.on("pull_request.edited", async ({ octokit, payload }) => {
     console.log(
       `Received a pull request event for #${payload.pull_request.number}`
     );
+
+    let owner,
+      repo,
+      branchRef,
+      prOwner,
+      prRepo,
+      prBranchRef,
+      prNumber,
+      prDescription,
+      prLink;
+
     try {
       // Extract relevant data from the PR
-      const pr = context.payload.pull_request;
-      const {
+      const pr = payload.pull_request;
+      ({
         owner,
         repo,
         branchRef,
@@ -40,7 +48,7 @@ const setupWebhooks = (ghApp) => {
         prNumber,
         prDescription,
         prLink,
-      } = extractPullRequestData(pr);
+      } = extractPullRequestData(pr));
 
       // Create an array of changelog entry strings from the PR description
       const changelogEntries = extractChangelogEntries(
@@ -80,9 +88,14 @@ const setupWebhooks = (ghApp) => {
       const changesetFilePath = `${CHANGESET_PATH}/${changesetFileName}`;
       const message = `Add changeset for PR #${prNumber}`;
 
+      const forkOwnerOcktokit = await getOcktokitClient(
+        ghApp,
+        prOwner,
+        prRepo
+      );
       // Create or update the changeset file using Github API
       await createOrUpdateFile(
-        octokit,
+        forkOwnerOcktokit,
         prOwner,
         prRepo,
         changesetFilePath,
@@ -90,14 +103,14 @@ const setupWebhooks = (ghApp) => {
         message,
         prBranchRef
       );
-      await updatePRLabel(
-        octokit,
-        owner,
-        repo,
-        prNumber,
-        FAILED_CHANGESET_LABEL,
-        false
-      );
+      // await updatePRLabel(
+      //   octokit,
+      //   owner,
+      //   repo,
+      //   prNumber,
+      //   FAILED_CHANGESET_LABEL,
+      //   false
+      // );
     } catch (error) {
       if (error.response) {
         console.error(
@@ -113,14 +126,14 @@ const setupWebhooks = (ghApp) => {
             error,
             getErrorComment
           );
-          await updatePRLabel(
-            octokit,
-            owner,
-            repo,
-            prNumber,
-            FAILED_CHANGESET_LABEL,
-            true
-          );
+          // await updatePRLabel(
+          //   octokit,
+          //   owner,
+          //   repo,
+          //   prNumber,
+          //   FAILED_CHANGESET_LABEL,
+          //   true
+          // );
         }
         console.error(error);
         throw error;

@@ -88,7 +88,7 @@ export const GITHUB_TOKEN = process.env.INPUT_TOKEN;
  * This path is read from an environment variable.
  * @type {string}
  */
-export const CHANGESET_PATH = process.env.INPUT_CHANGESET_PATH;
+export const CHANGESET_PATH = "changelogs/fragments";
 
 /**
 * The label that will be added to the PR if the "skip" option is used.
