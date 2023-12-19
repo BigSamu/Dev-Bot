@@ -3,8 +3,9 @@ import { Octokit } from "octokit";
 import {
   PullRequestDataExtractionError,
   GetGithubContentError,
-  CreateChangesetFileError,
-  UpdateChangesetFileError,
+  CreateFileError,
+  UpdateFileError,
+  DeleteFileError,
   CategoryWithSkipOptionError,
   UpdatePRLabelError,
 } from "./customErrors.js";
@@ -224,17 +225,22 @@ export const createOrUpdateFile = async (
   // File's SHA to check if file exists
   let sha, message;
   // Attempt to retrieve the file's SHA to check if it exists
+  console.log("------------------------------------");
+  console.log("owner", owner);
+  console.log("repo", repo);
+  console.log("prNumber", prNumber);
+  console.log("branchRef", branchRef);
+  console.log("path", path);
+  console.log("content", content);
+  console.log("------------------------------------");
   try {
-    const response = await octokit.rest.repos.getContent({
+    const { data } = await octokit.rest.repos.getContent({
       owner,
       repo,
       path,
       ref: branchRef,
     });
-    sha = response.data.sha;
-    message = `${
-      sha ? "update" : "create"
-    } changeset file ${prNumber}.yml for PR #${prNumber}`;
+    sha = data?.sha;
   } catch (error) {
     if (error.status === 404) {
       console.log("Changeset file not found. Proceeding to create a new one.");
@@ -242,7 +248,9 @@ export const createOrUpdateFile = async (
       throw new GetGithubContentError();
     }
   }
-
+  message = `${
+    sha ? "update" : "create"
+  } changeset file ${prNumber}.yml for PR #${prNumber}`;
   // Create or update the changeset file content
   try {
     await octokit.rest.repos.createOrUpdateFileContents({
@@ -256,11 +264,66 @@ export const createOrUpdateFile = async (
     });
     console.log(`File: ${path} ${sha ? "updated" : "created"} successfully.`);
   } catch (error) {
+    console.log(error);
     if (!sha) {
-      throw new CreateChangesetFileError();
+      throw new CreateFileError();
     } else {
-      throw new UpdateChangesetFileError();
+      throw new UpdateFileError();
     }
+  }
+};
+
+/**
+ * Deletes a file in a GitHub repository using an Octokit instance.
+ *
+ * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
+ * @param {string} owner - Owner of the repository.
+ * @param {string} repo - Repository name.
+ * @param {string} path - File path within the repository.
+ * @param {string} message - Commit message.
+ * @param {string} branchRef - Branch reference for the commit.
+ * @throws {GetGithubContentError} If retrieving the file content fails.
+ * @throws {DeleteFileError} If deleting the file fails.
+ */
+export const deleteFile = async (
+  octokit,
+  owner,
+  repo,
+  path,
+  message,
+  branchRef
+) => {
+  let sha;
+
+  // Retrieve the file's SHA to confirm existence
+  try {
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path,
+      ref: branchRef,
+    });
+    sha = data?.sha;
+    message = `${
+      sha ? "update" : "create"
+    } changeset file ${prNumber}.yml for PR #${prNumber}`;
+  } catch (error) {
+    throw new GetGithubContentError();
+  }
+
+  // Delete the file using its SHA
+  try {
+    await octokit.rest.repos.deleteFile({
+      owner,
+      repo,
+      path,
+      message,
+      sha,
+      branch: branchRef,
+    });
+    console.log(`File: ${path} deleted successfully.`);
+  } catch (error) {
+    throw new UpdateFileError();
   }
 };
 

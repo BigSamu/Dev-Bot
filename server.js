@@ -5,7 +5,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
-import { Octokit, App } from "octokit";
+import { App } from "octokit";
 import { createNodeMiddleware } from "@octokit/webhooks";
 
 import setupWebhooks from "./config/webhooks.js";

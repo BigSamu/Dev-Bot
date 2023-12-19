@@ -39,14 +39,14 @@ export class GetGithubContentError extends Error {
 }
 
 /**
- * Represents an error during the creation of a changeset file in a GitHub repository.
+ * Represents an error during the creation of a file in a GitHub repository.
  */
-export class CreateChangesetFileError extends Error {
+export class CreateFileError extends Error {
   /**
    * Constructs the CreateChangesetFileError instance.
-   * @param {string} [message="Error creating changeset file"] - Custom error message.
+   * @param {string} [message="Error creating file in repository"] - Custom error message.
    */
-  constructor(message = "Error creating changeset file") {
+  constructor(message = "Error creating file in repository") {
     super(message);
     this.name = this.constructor.name;
     /**
@@ -58,14 +58,14 @@ export class CreateChangesetFileError extends Error {
 }
 
 /**
- * Represents an error during the update of a changeset file in a GitHub repository.
+ * Represents an error during the update of a file in a GitHub repository.
  */
-export class UpdateChangesetFileError extends Error {
+export class UpdateFileError extends Error {
   /**
-   * Constructs the UpdateChangesetFileError instance.
-   * @param {string} [message="Error updating changeset file"] - Custom error message.
+   * Constructs the UpdateFileError instance.
+   * @param {string} [message="Error updating file in repository"] - Custom error message.
    */
-  constructor(message = "Error updating changeset file") {
+  constructor(message = "Error updating file in repository") {
     super(message);
     this.name = this.constructor.name;
     /**
@@ -75,6 +75,26 @@ export class UpdateChangesetFileError extends Error {
     this.shouldResultInPRComment = false;
   }
 }
+
+/**
+ * Represents an error during the deletion of a file in a GitHub repository.
+ */
+export class DeleteFileError extends Error {
+  /**
+   * Constructs the DeleteFileError instance.
+   * @param {string} [message="Error deleting file in repository"] - Custom error message.
+   */
+  constructor(message = "Error deleting file in repository") {
+    super(message);
+    this.name = this.constructor.name;
+    /**
+     * Indicates whether this error should trigger a comment in the pull request.
+     * @type {boolean}
+     */
+    this.shouldResultInPRComment = false;
+  }
+}
+
 
 /**
  * Represents an error that occurs when updating the label of a pull request.
