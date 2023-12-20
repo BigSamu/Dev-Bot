@@ -11,7 +11,6 @@ import {
   formatErrorMessage
 } from "../utils/formattingUtils.js";
 import {
-  deleteFile,
   extractPullRequestData,
   createOrUpdateFile,
   updatePRLabel,
@@ -68,10 +67,7 @@ export const create_or_update_changeset = async (ghApp, octokit, payload) => {
       owner,
       repo,
       prNumber,
-      prBranchRef,
-      updatePRLabel,
-      deleteFile,
-      CHANGESET_PATH
+      updatePRLabel
     );
 
     // Skip changeset file creation if the "skip" label was added to the PR
