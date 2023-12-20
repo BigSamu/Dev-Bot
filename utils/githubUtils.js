@@ -9,7 +9,7 @@ import {
   CategoryWithSkipOptionError,
   UpdatePRLabelError,
 } from "./customErrors.js";
-import { SKIP_LABEL } from "../config/constants.js";
+import { SKIP_LABEL, FAILED_CHANGESET_LABEL } from "../config/constants.js";
 
 /**
  * Extracts relevant data from a GitHub Pull Request from the GitHub action context.
@@ -137,8 +137,10 @@ export const handleSkipOption = async (
       throw new CategoryWithSkipOptionError();
     } else {
       console.log("No changeset file created or updated.");
-      // Adds  "skip-changelog" label in PR if not present
+      // Adds "Skip-Changelog" label in PR if not present
       await updateLabel(octokit, owner, repo, prNumber, SKIP_LABEL, true);
+      // Removes "failed changeset" label in PR if present
+      await updateLabel(octokit, owner, repo, prNumber, FAILED_CHANGESET_LABEL, false);
       // Define path to send to deleteFile function
       const changesetFilePath = `${path}/${prNumber}.yml`;
       // Delete a previous changeset file if it exists
