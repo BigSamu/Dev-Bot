@@ -116,6 +116,8 @@ export const updatePRLabel = async (
  * @param {string} repo - Repository name.
  * @param {number} prNumber - Pull request number.
  * @param {Function} updateLabel - Function to add or remove a label from a PR.
+ * @param {Function} deleteFile - Function to delete a file from a repository if it exists.
+ * @param {string} path - Path to the changeset file to be deleted, if it exists.
  * @throws {CategoryWithSkipOptionError} If 'skip' and other entries are present.
  */
 export const handleSkipOption = async (
@@ -124,7 +126,10 @@ export const handleSkipOption = async (
   owner,
   repo,
   prNumber,
-  updateLabel
+  prBranchRef,
+  updateLabel,
+  deleteFile,
+  path
 ) => {
   if (entryMap && Object.keys(entryMap).includes("skip")) {
     // Check if "skip" is the only prefix in the changeset entries
@@ -134,6 +139,10 @@ export const handleSkipOption = async (
       console.log("No changeset file created or updated.");
       // Adds  "skip-changelog" label in PR if not present
       await updateLabel(octokit, owner, repo, prNumber, SKIP_LABEL, true);
+      // Define path to send to deleteFile function
+      const changesetFilePath = `${path}/${prNumber}.yml`;
+      // Delete a previous changeset file if it exists
+      await deleteFile(octokit, owner, repo, prNumber, changesetFilePath, prBranchRef)
       // Indicates to index.js that the program should exit without creating or updating the changeset file
       return true;
     }
@@ -279,8 +288,8 @@ export const createOrUpdateFile = async (
  * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
  * @param {string} owner - Owner of the repository.
  * @param {string} repo - Repository name.
+ * @param {number} prNumber - Pull request number.
  * @param {string} path - File path within the repository.
- * @param {string} message - Commit message.
  * @param {string} branchRef - Branch reference for the commit.
  * @throws {GetGithubContentError} If retrieving the file content fails.
  * @throws {DeleteFileError} If deleting the file fails.
@@ -289,8 +298,8 @@ export const deleteFile = async (
   octokit,
   owner,
   repo,
+  prNumber,
   path,
-  message,
   branchRef
 ) => {
   let sha;
@@ -304,15 +313,17 @@ export const deleteFile = async (
       ref: branchRef,
     });
     sha = data?.sha;
-    message = `${
-      sha ? "update" : "create"
-    } changeset file ${prNumber}.yml for PR #${prNumber}`;
   } catch (error) {
-    throw new GetGithubContentError();
+    if(error.status === 404) {
+      console.log("No changeset file to delete.")
+    } else {
+      throw new GetGithubContentError();
+    }
   }
-
+  
   // Delete the file using its SHA
   try {
+    const message = `Delete changeset file ${prNumber}.yml for PR #${prNumber}`;
     await octokit.rest.repos.deleteFile({
       owner,
       repo,
@@ -323,7 +334,7 @@ export const deleteFile = async (
     });
     console.log(`File: ${path} deleted successfully.`);
   } catch (error) {
-    throw new UpdateFileError();
+    throw new DeleteFileError();
   }
 };
 
