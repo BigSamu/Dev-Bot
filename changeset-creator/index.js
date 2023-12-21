@@ -1,6 +1,5 @@
 // Webhook handling logic
 import { CHANGESET_PATH, FAILED_CHANGESET_LABEL } from "../config/constants.js";
-
 import {
   processLine,
   extractChangelogEntries,
