@@ -9,6 +9,7 @@ const setupWebhooks = (ghApp) => {
   });
 
   ghApp.webhooks.on("pull_request.edited", async ({ octokit, payload }) => {
+    console.log(octokit)
     console.log(
       `Received a pull request edition event for #${payload.pull_request.number}`
     );

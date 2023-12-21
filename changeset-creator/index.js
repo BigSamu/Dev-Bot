@@ -76,7 +76,7 @@ export const create_or_update_changeset = async (ghApp, octokit, payload) => {
       console.log("Skipping changeset creation because of 'skip' option.");
       return;
     }
-    console.log("testing...")
+
     // Prepare some parameters for creating or updating the changeset file
     const changesetEntriesContent = Buffer.from(
       prepareChangesetEntriesContent(changelogEntriesMap)
