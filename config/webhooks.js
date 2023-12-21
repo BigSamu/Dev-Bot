@@ -5,15 +5,14 @@ const setupWebhooks = (ghApp) => {
     console.log(
       `Received a pull request creation event for #${payload.pull_request.number}`
     );
-    create_or_update_changeset(ghApp,octokit, payload);
+    await create_or_update_changeset(ghApp,octokit, payload);
   });
 
   ghApp.webhooks.on("pull_request.edited", async ({ octokit, payload }) => {
-    console.log(octokit)
     console.log(
       `Received a pull request edition event for #${payload.pull_request.number}`
     );
-    create_or_update_changeset(ghApp, octokit, payload);
+    await create_or_update_changeset(ghApp, octokit, payload);
   });
 
   ghApp.webhooks.onError((error) => {
