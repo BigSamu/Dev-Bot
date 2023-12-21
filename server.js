@@ -15,9 +15,10 @@ dotenv.config();
 
 // 2) Set configured values
 const appId = process.env.GITHUB_APP_IDENTIFIER;
-const privateKeyPath = process.env.PRIVATE_KEY_PATH;
-const secret = process.env.GITHUB_WEBHOOK_SECRET;
-const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+// const privateKeyPath = process.env.PRIVATE_KEY_PATH;
+const secret = process.env.GITHUB_APP_WEBHOOK_SECRET;
+// const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
 
 // 2) Intiliazing Express and GitHub App instances
 const app = express(); // Express server
