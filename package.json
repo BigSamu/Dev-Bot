@@ -5,6 +5,9 @@
   "description": "A GitHub App that generates changeset files from OpenSearch PR descriptions",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": ">=14.x"
+  },
   "scripts": {
     "server": "node server.js",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg"
