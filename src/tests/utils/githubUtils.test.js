@@ -14,7 +14,7 @@ import {
   UpdateFileError,
   UpdatePRLabelError,
   CategoryWithSkipOptionError,
-} from "../../utils/customErrors.js";
+} from "../../errors/index.js";
 import { SKIP_LABEL } from "../../config/constants.js";
 
 // Mock Octokit Client

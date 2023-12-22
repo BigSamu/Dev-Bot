@@ -2,7 +2,7 @@ import { CHANGELOG_SECTION_REGEX } from "../config/constants.js";
 import {
   InvalidChangelogHeadingError,
   EmptyChangelogSectionError,
-} from "./customErrors.js";
+} from "../errors/index.js";
 
 /**
  * Processes a line from a changelog section, handling comment blocks and trimming non-comment lines.
@@ -79,7 +79,7 @@ export const extractChangelogEntries = (prDescription, processLine) => {
       changelogEntries.length === 1 ? "entry" : "entries"
     }.`
   );
-  console.log(changelogEntries)
+  console.log(changelogEntries);
 
   return changelogEntries;
 };

@@ -5,7 +5,7 @@ import {
 import {
   EmptyChangelogSectionError,
   InvalidChangelogHeadingError,
-} from "../../utils/customErrors.js";
+} from "../../errors/index.js";
 
 describe("Changelog Parser Tests", () => {
   describe("processLine", () => {

@@ -8,7 +8,7 @@ import {
   EntryTooLongError,
   ChangelogEntryMissingHyphenError,
   EmptyEntryDescriptionError,
-} from "./customErrors.js";
+} from "../errors/index.js";
 
 /**
  * Formats a changelog entry with its associated PR number and link.
