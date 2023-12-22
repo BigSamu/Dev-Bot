@@ -20,7 +20,7 @@ import {
   getOcktokitClient,
 } from "../utils/githubUtils.js";
 
-export const create_or_update_changeset = async (ghApp, octokit, payload) => {
+export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
   let owner,
     repo,
     branchRef,
