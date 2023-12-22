@@ -187,8 +187,6 @@ export const postPRComment = async (
   prNumber,
   comment
 ) => {
-
-
   if (comment) {
     try {
       // Post a comment to the pull request
