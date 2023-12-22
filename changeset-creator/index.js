@@ -109,14 +109,13 @@ export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
       );
     } else {
       if (owner && repo && prNumber) {
+        const comment = getErrorComment(errorInput, formatErrorMessage);
         await postPRComment(
           octokit,
           owner,
           repo,
           prNumber,
-          error,
-          getErrorComment,
-          formatErrorMessage
+          comment
         );
         await updatePRLabel(
           octokit,

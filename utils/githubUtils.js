@@ -178,19 +178,16 @@ export const getErrorComment = (errorInput, formatErrorMessage) => {
  * @param {string} owner - Owner of the repository.
  * @param {string} repo - Repository name.
  * @param {number} prNumber - Pull request number.
- * @param {Error} errorInput - Error object that determines the comment to be posted.
- * @param {Function} getErrorComment - Function that generates a comment string for a given error object based on its properties.
+ * @param {string} comment - Comment to be posted.
  */
 export const postPRComment = async (
   octokit,
   owner,
   repo,
   prNumber,
-  errorInput,
-  getErrorComment,
-  formatErrorMessage
+  comment
 ) => {
-  const comment = getErrorComment(errorInput, formatErrorMessage);
+
 
   if (comment) {
     try {
