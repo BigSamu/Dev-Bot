@@ -1,5 +1,8 @@
 // Webhook handling logic
-import { CHANGESET_PATH, FAILED_CHANGESET_LABEL } from "../config/constants.js";
+import {
+  CHANGESET_PATH,
+  FAILED_CHANGESET_LABEL,
+} from "../src/config/constants.js";
 import {
   processLine,
   extractChangelogEntries,
@@ -8,7 +11,7 @@ import {
   prepareChangelogEntry,
   prepareChangelogEntriesMap,
   prepareChangesetEntriesContent,
-  formatErrorMessage
+  formatErrorMessage,
 } from "../utils/formattingUtils.js";
 import {
   extractPullRequestData,
@@ -110,13 +113,7 @@ export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
     } else {
       if (owner && repo && prNumber) {
         const comment = getErrorComment(errorInput, formatErrorMessage);
-        await postPRComment(
-          octokit,
-          owner,
-          repo,
-          prNumber,
-          comment
-        );
+        await postPRComment(octokit, owner, repo, prNumber, comment);
         await updatePRLabel(
           octokit,
           owner,

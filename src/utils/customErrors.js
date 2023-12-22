@@ -95,7 +95,6 @@ export class DeleteFileError extends Error {
   }
 }
 
-
 /**
  * Represents an error that occurs when updating the label of a pull request.
  */

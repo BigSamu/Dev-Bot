@@ -1,8 +1,8 @@
 import {
   PullRequestDataExtractionError,
   GetGithubContentError,
-  CreateChangesetFileError,
-  UpdateChangesetFileError,
+  CreateFileError,
+  UpdateFileError,
   UpdatePRLabelError,
   InvalidChangelogHeadingError,
   EntryTooLongError,
@@ -32,17 +32,17 @@ describe("Custom Errors Tests", () => {
     expect(error.shouldResultInPRComment).toBe(false);
   });
 
-  test("CreateChangesetFileError default message", () => {
-    const error = new CreateChangesetFileError();
-    expect(error.message).toBe("Error creating changeset file");
-    expect(error.name).toBe("CreateChangesetFileError");
+  test("CreateFileError default message", () => {
+    const error = new CreateFileError();
+    expect(error.message).toBe("Error creating file in repository");
+    expect(error.name).toBe("CreateFileError");
     expect(error.shouldResultInPRComment).toBe(false);
   });
 
-  test("UpdateChangesetFileError default message", () => {
-    const error = new UpdateChangesetFileError();
-    expect(error.message).toBe("Error updating changeset file");
-    expect(error.name).toBe("UpdateChangesetFileError");
+  test("UpdateFileError default message", () => {
+    const error = new UpdateFileError();
+    expect(error.message).toBe("Error updating file in repository");
+    expect(error.name).toBe("UpdateFileError");
     expect(error.shouldResultInPRComment).toBe(false);
   });
 

@@ -1,4 +1,4 @@
-import github from "@actions/github";
+import { Octokit } from "octokit";
 import {
   extractPullRequestData,
   updatePRLabel,
@@ -10,127 +10,84 @@ import {
 import {
   PullRequestDataExtractionError,
   GetGithubContentError,
-  CreateChangesetFileError,
-  UpdateChangesetFileError,
+  CreateFileError,
+  UpdateFileError,
   UpdatePRLabelError,
   CategoryWithSkipOptionError,
 } from "../../utils/customErrors.js";
 import { SKIP_LABEL } from "../../config/constants.js";
 
-// Mock the @actions/github module
-jest.mock("@actions/github", () => ({
-  getOctokit: jest.fn(),
-  context: {
+// Mock Octokit Client
+jest.mock("octokit", () => {
+  return {
+    Octokit: jest.fn(),
+  };
+});
+
+// Mock Pull Request Payload
+const mockPullRequestPayload = {
+  base: {
+    ref: "test-base-branch",
     repo: {
-      owner: "testOwner",
-      repo: "testRepo",
-    },
-    payload: {
-      pull_request: {
-        number: 123,
-        head: {
-          ref: "testBranch",
-        },
+      name: "test-base-repo",
+      owner: {
+        login: "test-owner",
       },
     },
   },
-}));
+  head: {
+    ref: "test-feature-branch",
+    repo: {
+      name: "test-forked-repo",
+      owner: {
+        login: "test-contributor",
+      },
+    },
+  },
+  number: "123",
+  body: "Test PR body",
+  html_url: "http://example.com/pr/123",
+};
 
 describe("Github Utils Tests", () => {
-  const owner = github.context.repo.owner;
-  const repo = github.context.repo.repo;
-  const prNumber = github.context.payload.pull_request.number;
-  const branchRef = github.context.payload.pull_request.head.ref;
+  const owner = mockPullRequestPayload.base.repo.owner.login;
+  const repo = mockPullRequestPayload.base.repo.name;
+  const branchRef = mockPullRequestPayload.base.ref;
+  const prOwner = mockPullRequestPayload.head.repo.owner.login;
+  const prRepo = mockPullRequestPayload.head.repo.name;
+  const prBranchRef = mockPullRequestPayload.head.ref;
+  const prNumber = mockPullRequestPayload.number;
+  const prDescription = mockPullRequestPayload.body;
+  const prLink = mockPullRequestPayload.html_url;
 
   const apiError = new Error("API Failure");
 
   describe("extractPullRequestData", () => {
-    const mockPullsGet = jest.fn();
-    const octokitMock = {
-      rest: {
-        pulls: {
-          get: mockPullsGet,
-        },
-      },
-    };
-
-    beforeAll(() => {
-      github.getOctokit.mockImplementation(() => octokitMock);
-    });
-    beforeEach(() => {
-      github.getOctokit.mockClear();
-    });
-
-    test("successfully extracts pull request data", async () => {
-      const mockPRData = {
-        data: {
-          body: "Test PR body",
-          html_url: "http://example.com/pr/123",
-        },
-      };
-      mockPullsGet.mockResolvedValueOnce(mockPRData);
+    test("successfully extracts pull request data", () => {
       const expectedData = {
-        owner: "testOwner",
-        repo: "testRepo",
-        prNumber: 123,
-        prDescription: mockPRData.data.body,
-        prLink: mockPRData.data.html_url,
-        branchRef: "testBranch",
+        owner: owner,
+        repo: repo,
+        branchRef: branchRef,
+        prOwner: prOwner,
+        prRepo: prRepo,
+        prBranchRef: prBranchRef,
+        prNumber: prNumber,
+        prDescription: prDescription,
+        prLink: prLink,
       };
-      const actualData = await extractPullRequestData(octokitMock);
+      const actualData = extractPullRequestData(mockPullRequestPayload);
       expect(actualData).toEqual(expectedData);
-      expect(mockPullsGet).toHaveBeenCalledWith({
-        owner: expectedData.owner,
-        repo: expectedData.repo,
-        pull_number: expectedData.prNumber,
-      });
-      expect(mockPullsGet).toHaveBeenCalledTimes(1);
     });
 
-    test("throws PullRequestDataExtractionError on API failure", async () => {
-      mockPullsGet.mockRejectedValueOnce(apiError);
-      await expect(extractPullRequestData(octokitMock)).rejects.toThrow(
-        PullRequestDataExtractionError
-      );
-      expect(mockPullsGet).toHaveBeenCalledTimes(1);
-    });
-
-    test.each([
-      [null, "null response"],
-      [undefined, "undefined response"],
-      ["not-an-object", "non-object response"],
-    ])("throws error for %s data", async (response, description) => {
-      mockPullsGet.mockResolvedValueOnce({ data: response });
-      await expect(extractPullRequestData(octokitMock)).rejects.toThrow(
-        PullRequestDataExtractionError
-      );
-    });
-
-    test.each([
-      [undefined, "undefined response"],
-      [null, "null response"],
-      [{ data: {} }, "empty data field"],
-    ])(
-      "throws error for %s response from API",
-      async (resolvedValue, description) => {
-        mockPullsGet.mockResolvedValueOnce(resolvedValue);
-        await expect(extractPullRequestData(octokitMock)).rejects.toThrow(
-          PullRequestDataExtractionError
-        );
-      }
-    );
-
-    test("throws error for incomplete response data", async () => {
-      // Simulating missing 'body' in the response
-      const incompleteData = {
-        data: {
-          html_url: "http://example.com/pr",
+    test("throws PullRequestDataExtractionError when payload is missing required fields", () => {
+      const incompletePayload = {
+        base: {
+          /* Missing required fields */
         },
       };
-      mockPullsGet.mockResolvedValueOnce(incompleteData);
-      await expect(extractPullRequestData(octokitMock)).rejects.toThrow(
-        PullRequestDataExtractionError
-      );
+      expect(() => {
+        extractPullRequestData(incompletePayload);
+      }).toThrow(PullRequestDataExtractionError);
     });
   });
 
@@ -150,11 +107,12 @@ describe("Github Utils Tests", () => {
       },
     };
 
-    beforeAll(() => {
-      github.getOctokit.mockImplementation(() => octokitMock);
-    });
     beforeEach(() => {
-      github.getOctokit.mockClear();
+      // Reset the mock implementations for each test
+      mockAddLabels.mockClear();
+      mockListLabelsOnIssue.mockClear();
+      mockRemoveLabel.mockClear();
+      Octokit.mockImplementation(() => octokitMock);
     });
 
     test("successfully adds a label when it doesn't exist", async () => {
@@ -291,12 +249,10 @@ describe("Github Utils Tests", () => {
     const mockUpdateLabel = jest.fn();
     const octokitMock = jest.fn();
 
-    beforeAll(() => {
-      github.getOctokit.mockImplementation(() => octokitMock);
-    });
     beforeEach(() => {
-      github.getOctokit.mockClear();
+      // Reset the mock implementations for each test
       mockUpdateLabel.mockClear();
+      Octokit.mockImplementation(() => octokitMock);
     });
 
     test("calls updateLabel() with 'skip-changelog' label when 'skip' is the only entry in entryMap param", async () => {
@@ -368,29 +324,48 @@ describe("Github Utils Tests", () => {
 
   describe("getErrorComment", () => {
     const mockErrorInput = new Error("Test error message");
-    mockErrorInput.name = "TestError";
+    const mockFormatErrorMessage = jest.fn();
+
+    beforeEach(() => {
+      // Reset the mock implementations for each test
+      mockFormatErrorMessage.mockClear();
+    });
     test("returns a comment string for errors that should result in a PR comment", () => {
       mockErrorInput.shouldResultInPRComment = true;
-      const result = getErrorComment(mockErrorInput);
-      expect(result).toBe("TestError: Test error message");
+      mockFormatErrorMessage.mockReturnValueOnce(
+        "TestError: Test error message formatted"
+      );
+      const result = getErrorComment(mockErrorInput, mockFormatErrorMessage);
+
+      expect(mockFormatErrorMessage).toHaveBeenCalledWith(mockErrorInput);
+      expect(mockFormatErrorMessage).toHaveBeenCalledTimes(1);
+      expect(result).toBe("TestError: Test error message formatted");
     });
 
     test("returns null for errors that should not result in a PR comment", () => {
       mockErrorInput.shouldResultInPRComment = false;
-      const result = getErrorComment(mockErrorInput);
+      mockFormatErrorMessage.mockReturnValueOnce(
+        "TestError: Test error message formatted"
+      );
+      const result = getErrorComment(mockErrorInput, mockFormatErrorMessage);
+
+      expect(mockFormatErrorMessage).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
     test("returns null for errors without a shouldResultInPRComment property", () => {
-      const result = getErrorComment(mockErrorInput);
+      mockFormatErrorMessage.mockReturnValueOnce(
+        "TestError: Test error message formatted"
+      );
+      const result = getErrorComment(mockErrorInput, mockFormatErrorMessage);
+
+      expect(mockFormatErrorMessage).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
   });
 
   describe("postPRComment", () => {
-    const mockErrorInput = new Error("Test error message");
     const testComment = "formatted comment string";
-    const mockGetErrorComment = jest.fn();
     const mockCreateComment = jest.fn();
 
     const octokitMock = {
@@ -401,28 +376,16 @@ describe("Github Utils Tests", () => {
       },
     };
 
-    beforeAll(() => {
-      github.getOctokit.mockImplementation(() => octokitMock);
-    });
     beforeEach(() => {
-      mockGetErrorComment.mockClear();
-      github.getOctokit.mockClear();
+      // Reset the mock implementations for each test
+      mockCreateComment.mockClear();
+      Octokit.mockImplementation(() => octokitMock);
     });
 
     test("successfully posts a comment", async () => {
-      mockGetErrorComment.mockReturnValueOnce(testComment);
       mockCreateComment.mockResolvedValueOnce({ status: 200 });
-      await postPRComment(
-        octokitMock,
-        owner,
-        repo,
-        prNumber,
-        mockErrorInput,
-        mockGetErrorComment
-      );
+      await postPRComment(octokitMock, owner, repo, prNumber, testComment);
 
-      expect(mockGetErrorComment).toHaveBeenCalledWith(mockErrorInput);
-      expect(mockGetErrorComment).toHaveBeenCalledTimes(1);
       expect(mockCreateComment).toHaveBeenCalledWith({
         owner,
         repo,
@@ -433,34 +396,17 @@ describe("Github Utils Tests", () => {
     });
 
     test("does not post a comment when getErrorComment returns null", async () => {
-      mockGetErrorComment.mockReturnValueOnce(null);
-      await postPRComment(
-        octokitMock,
-        owner,
-        repo,
-        prNumber,
-        mockErrorInput,
-        mockGetErrorComment
-      );
-      expect(mockGetErrorComment).toHaveBeenCalledWith(mockErrorInput);
-      expect(mockGetErrorComment).toHaveBeenCalledTimes(1);
+      const testComment = null;
+      await postPRComment(octokitMock, owner, repo, prNumber, testComment);
+
       expect(mockCreateComment).not.toHaveBeenCalled();
     });
 
     test("handles error when posting a comment fails", async () => {
-      mockGetErrorComment.mockReturnValueOnce(testComment);
       mockCreateComment.mockRejectedValueOnce(apiError);
 
-      await postPRComment(
-        octokitMock,
-        owner,
-        repo,
-        prNumber,
-        mockErrorInput,
-        mockGetErrorComment
-      );
-      expect(mockGetErrorComment).toHaveBeenCalledWith(mockErrorInput);
-      expect(mockGetErrorComment).toHaveBeenCalledTimes(1);
+      await postPRComment(octokitMock, owner, repo, prNumber, testComment);
+
       expect(mockCreateComment).toHaveBeenCalledWith({
         owner,
         repo,
@@ -472,9 +418,8 @@ describe("Github Utils Tests", () => {
   });
 
   describe("createOrUpdateFile", () => {
-    const changesetFilePath = "test/path/changesets/directory";
-    const changesetFileContent = "Changeset test content";
-    const changesetCommitMessage = "Changeset commit message";
+    const filePath = "path/to/file";
+    const fileContent = "Test content in file";
     const mockGetContent = jest.fn();
     const mockCreateOrUpdateFileContents = jest.fn();
 
@@ -487,11 +432,11 @@ describe("Github Utils Tests", () => {
       },
     };
 
-    beforeAll(() => {
-      github.getOctokit.mockImplementation(() => octokitMock);
-    });
     beforeEach(() => {
-      github.getOctokit.mockClear();
+      // Reset the mock implementations for each test
+      mockGetContent.mockClear();
+      mockCreateOrUpdateFileContents.mockClear();
+      Octokit.mockImplementation(() => octokitMock);
     });
 
     test("creates a new changeset file when it does not exist", async () => {
@@ -501,25 +446,25 @@ describe("Github Utils Tests", () => {
         octokitMock,
         owner,
         repo,
-        changesetFilePath,
-        changesetFileContent,
-        changesetCommitMessage,
-        branchRef
+        branchRef,
+        prNumber,
+        filePath,
+        fileContent
       );
 
       expect(mockGetContent).toHaveBeenCalledWith({
         owner,
         repo,
-        path: changesetFilePath,
+        path: filePath,
         ref: branchRef,
       });
       expect(mockGetContent).toHaveBeenCalledTimes(1);
       expect(mockCreateOrUpdateFileContents).toHaveBeenCalledWith({
         owner,
         repo,
-        path: changesetFilePath,
-        message: changesetCommitMessage,
-        content: changesetFileContent,
+        path: filePath,
+        message: `create file ${prNumber}.yml for PR #${prNumber}`,
+        content: fileContent,
         sha: undefined,
         branch: branchRef,
       });
@@ -535,25 +480,25 @@ describe("Github Utils Tests", () => {
         octokitMock,
         owner,
         repo,
-        changesetFilePath,
-        changesetFileContent,
-        changesetCommitMessage,
-        branchRef
+        branchRef,
+        prNumber,
+        filePath,
+        fileContent
       );
 
       expect(mockGetContent).toHaveBeenCalledWith({
         owner,
         repo,
-        path: changesetFilePath,
+        path: filePath,
         ref: branchRef,
       });
       expect(mockGetContent).toHaveBeenCalledTimes(1);
       expect(mockCreateOrUpdateFileContents).toHaveBeenCalledWith({
         owner,
         repo,
-        path: changesetFilePath,
-        message: changesetCommitMessage,
-        content: changesetFileContent,
+        path: filePath,
+        message: `update file ${prNumber}.yml for PR #${prNumber}`,
+        content: fileContent,
         sha,
         branch: branchRef,
       });
@@ -570,23 +515,23 @@ describe("Github Utils Tests", () => {
           octokitMock,
           owner,
           repo,
-          changesetFilePath,
-          changesetFileContent,
-          changesetCommitMessage,
-          branchRef
+          branchRef,
+          prNumber,
+          filePath,
+          fileContent
         )
       ).rejects.toThrow(GetGithubContentError);
       expect(mockGetContent).toHaveBeenCalledWith({
         owner,
         repo,
-        path: changesetFilePath,
+        path: filePath,
         ref: branchRef,
       });
       expect(mockGetContent).toHaveBeenCalledTimes(1);
       expect(mockCreateOrUpdateFileContents).not.toHaveBeenCalled();
     });
 
-    test("throws CreateChangesetFileError when creating a new file fails", async () => {
+    test("throws CreateFileError when creating a new file fails", async () => {
       mockGetContent.mockRejectedValueOnce({ status: 404 });
       mockCreateOrUpdateFileContents.mockRejectedValueOnce(apiError);
 
@@ -595,15 +540,15 @@ describe("Github Utils Tests", () => {
           octokitMock,
           owner,
           repo,
-          changesetFilePath,
-          changesetFileContent,
-          changesetCommitMessage,
-          branchRef
+          branchRef,
+          prNumber,
+          filePath,
+          fileContent
         )
-      ).rejects.toThrow(CreateChangesetFileError);
+      ).rejects.toThrow(CreateFileError);
     });
 
-    test("throws UpdateChangesetFileError when updating an existing file fails", async () => {
+    test("throws UpdateFileError when updating an existing file fails", async () => {
       const sha = "existing-file-sha";
       mockGetContent.mockResolvedValueOnce({ data: { sha } });
       const updateError = new Error("Update failed");
@@ -614,12 +559,12 @@ describe("Github Utils Tests", () => {
           octokitMock,
           owner,
           repo,
-          changesetFilePath,
-          changesetFileContent,
-          changesetCommitMessage,
-          branchRef
+          branchRef,
+          prNumber,
+          filePath,
+          fileContent
         )
-      ).rejects.toThrow(UpdateChangesetFileError);
+      ).rejects.toThrow(UpdateFileError);
     });
   });
 });

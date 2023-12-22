@@ -204,7 +204,7 @@ export const postPRComment = async (
     }
   } else {
     console.log(
-      `No comment posted to PR #${prNumber} due to error type: ${errorInput.name}`
+      `No comment posted to PR #${prNumber} due to empty comment`
     );
   }
 };
@@ -251,14 +251,14 @@ export const createOrUpdateFile = async (
     sha = data?.sha;
   } catch (error) {
     if (error.status === 404) {
-      console.log("Changeset file not found. Proceeding to create a new one.");
+      console.log("File not found. Proceeding to create a new one.");
     } else {
       throw new GetGithubContentError();
     }
   }
   message = `${
     sha ? "update" : "create"
-  } changeset file ${prNumber}.yml for PR #${prNumber}`;
+  } file ${prNumber}.yml for PR #${prNumber}`;
   // Create or update the changeset file content
   try {
     await octokit.rest.repos.createOrUpdateFileContents({
