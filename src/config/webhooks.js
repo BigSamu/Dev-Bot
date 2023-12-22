@@ -1,7 +1,7 @@
 import { createOrUpdateChangesetFile } from "../changeset-creator/index.js";
 
 export const setupWebhooks = (ghApp) => {
-  ghApp.webhooks.on("pull_request.created", async ({ octokit, payload }) => {
+  ghApp.webhooks.on("pull_request.opened", async ({ octokit, payload }) => {
     console.log(
       `Received a pull request creation event for #${payload.pull_request.number}`
     );
