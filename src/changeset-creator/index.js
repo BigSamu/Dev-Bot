@@ -1,5 +1,8 @@
 // Webhook handling logic
-import { CHANGESET_PATH, FAILED_CHANGESET_LABEL } from "../config/constants.js";
+import {
+  CHANGESET_PATH,
+  FAILED_CHANGESET_LABEL,
+} from "../config/constants.js";
 import {
   processLine,
   extractChangelogEntries,
@@ -8,7 +11,7 @@ import {
   prepareChangelogEntry,
   prepareChangelogEntriesMap,
   prepareChangesetEntriesContent,
-  formatErrorMessage
+  formatErrorMessage,
 } from "../utils/formattingUtils.js";
 import {
   extractPullRequestData,
@@ -20,7 +23,7 @@ import {
   getOcktokitClient,
 } from "../utils/githubUtils.js";
 
-export const create_or_update_changeset = async (ghApp, octokit, payload) => {
+export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
   let owner,
     repo,
     branchRef,
@@ -109,15 +112,8 @@ export const create_or_update_changeset = async (ghApp, octokit, payload) => {
       );
     } else {
       if (owner && repo && prNumber) {
-        await postPRComment(
-          octokit,
-          owner,
-          repo,
-          prNumber,
-          error,
-          getErrorComment,
-          formatErrorMessage
-        );
+        const comment = getErrorComment(errorInput, formatErrorMessage);
+        await postPRComment(octokit, owner, repo, prNumber, comment);
         await updatePRLabel(
           octokit,
           owner,

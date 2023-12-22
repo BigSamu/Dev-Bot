@@ -1,8 +1,8 @@
 import {
   PullRequestDataExtractionError,
   GetGithubContentError,
-  CreateChangesetFileError,
-  UpdateChangesetFileError,
+  CreateFileError,
+  UpdateFileError,
   UpdatePRLabelError,
   InvalidChangelogHeadingError,
   EntryTooLongError,
@@ -11,9 +11,9 @@ import {
   ChangelogEntryMissingHyphenError,
   EmptyEntryDescriptionError,
   EmptyChangelogSectionError,
-} from "../utils/customErrors.js";
+} from "../../utils/customErrors.js";
 
-import { MAX_ENTRY_LENGTH } from "../config/constants.js";
+import { MAX_ENTRY_LENGTH } from "../../config/constants.js";
 
 describe("Custom Errors Tests", () => {
   test("PullRequestDataExtractionError default message", () => {
@@ -25,22 +25,24 @@ describe("Custom Errors Tests", () => {
 
   test("GetGithubContentError default message", () => {
     const error = new GetGithubContentError();
-    expect(error.message).toBe("Error retrieving content from GitHub repository");
+    expect(error.message).toBe(
+      "Error retrieving content from GitHub repository"
+    );
     expect(error.name).toBe("GetGithubContentError");
     expect(error.shouldResultInPRComment).toBe(false);
   });
 
-  test("CreateChangesetFileError default message", () => {
-    const error = new CreateChangesetFileError();
-    expect(error.message).toBe("Error creating changeset file");
-    expect(error.name).toBe("CreateChangesetFileError");
+  test("CreateFileError default message", () => {
+    const error = new CreateFileError();
+    expect(error.message).toBe("Error creating file in repository");
+    expect(error.name).toBe("CreateFileError");
     expect(error.shouldResultInPRComment).toBe(false);
   });
 
-  test("UpdateChangesetFileError default message", () => {
-    const error = new UpdateChangesetFileError();
-    expect(error.message).toBe("Error updating changeset file");
-    expect(error.name).toBe("UpdateChangesetFileError");
+  test("UpdateFileError default message", () => {
+    const error = new UpdateFileError();
+    expect(error.message).toBe("Error updating file in repository");
+    expect(error.name).toBe("UpdateFileError");
     expect(error.shouldResultInPRComment).toBe(false);
   });
 
