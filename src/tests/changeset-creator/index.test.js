@@ -1,4 +1,4 @@
-import { createOrUpdateChangesetFile } from "../../../changeset-creator/index.js";
+import { createOrUpdateChangesetFile } from "../../changeset-creator/index.js";
 
 describe("Changeset Creator Tests", () => {
   describe("createOrUpdateChangesetFile", () => {

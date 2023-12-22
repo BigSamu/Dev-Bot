@@ -2,7 +2,7 @@
 import {
   CHANGESET_PATH,
   FAILED_CHANGESET_LABEL,
-} from "../src/config/constants.js";
+} from "../config/constants.js";
 import {
   processLine,
   extractChangelogEntries,

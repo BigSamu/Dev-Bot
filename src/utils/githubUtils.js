@@ -233,14 +233,6 @@ export const createOrUpdateFile = async (
   // File's SHA to check if file exists
   let sha, message;
   // Attempt to retrieve the file's SHA to check if it exists
-  console.log("------------------------------------");
-  console.log("owner", owner);
-  console.log("repo", repo);
-  console.log("prNumber", prNumber);
-  console.log("branchRef", branchRef);
-  console.log("path", path);
-  console.log("content", content);
-  console.log("------------------------------------");
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner,
@@ -272,7 +264,7 @@ export const createOrUpdateFile = async (
     });
     console.log(`File: ${path} ${sha ? "updated" : "created"} successfully.`);
   } catch (error) {
-    console.log(error);
+
     if (!sha) {
       throw new CreateFileError();
     } else {
