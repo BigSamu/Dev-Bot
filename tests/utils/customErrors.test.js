@@ -11,9 +11,9 @@ import {
   ChangelogEntryMissingHyphenError,
   EmptyEntryDescriptionError,
   EmptyChangelogSectionError,
-} from "../utils/customErrors.js";
+} from "../../utils/customErrors.js";
 
-import { MAX_ENTRY_LENGTH } from "../config/constants.js";
+import { MAX_ENTRY_LENGTH } from "../../config/constants.js";
 
 describe("Custom Errors Tests", () => {
   test("PullRequestDataExtractionError default message", () => {
@@ -25,7 +25,9 @@ describe("Custom Errors Tests", () => {
 
   test("GetGithubContentError default message", () => {
     const error = new GetGithubContentError();
-    expect(error.message).toBe("Error retrieving content from GitHub repository");
+    expect(error.message).toBe(
+      "Error retrieving content from GitHub repository"
+    );
     expect(error.name).toBe("GetGithubContentError");
     expect(error.shouldResultInPRComment).toBe(false);
   });

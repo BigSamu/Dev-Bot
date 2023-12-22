@@ -1,11 +1,11 @@
 import {
   processLine,
   extractChangelogEntries,
-} from "../utils/changelogParser.js";
+} from "../../utils/changelogParser.js";
 import {
   EmptyChangelogSectionError,
   InvalidChangelogHeadingError,
-} from "../utils/customErrors.js";
+} from "../../utils/customErrors.js";
 
 describe("Changelog Parser Tests", () => {
   describe("processLine", () => {
@@ -102,7 +102,6 @@ describe("Changelog Parser Tests", () => {
       expect(mockProcessLine).toHaveBeenCalledTimes(6);
     });
 
-
     test("should convert a valid changelog section with a single entriy into an array of changelog entries", () => {
       const singleChangelogEntry =
         "## Changelog\n" +
@@ -121,9 +120,7 @@ describe("Changelog Parser Tests", () => {
         .mockReturnValueOnce({ state: { inComment: false }, line: null })
         .mockReturnValueOnce({ state: { inComment: false }, line: null });
 
-      const expectedChangelogEntryArray = [
-        "A single changelog entry line",
-      ];
+      const expectedChangelogEntryArray = ["A single changelog entry line"];
       const actualChangelogEntryArray = extractChangelogEntries(
         singleChangelogEntry,
         mockProcessLine
