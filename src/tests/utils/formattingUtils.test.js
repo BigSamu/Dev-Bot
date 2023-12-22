@@ -12,7 +12,7 @@ import {
   EmptyEntryDescriptionError,
   EntryTooLongError,
   ChangelogEntryMissingHyphenError,
-} from "../../utils/customErrors.js";
+} from "../../errors/index.js";
 
 describe("Formatting Utils Tests", () => {
   const prNumber = 123;

@@ -8,7 +8,7 @@ import {
   DeleteFileError,
   CategoryWithSkipOptionError,
   UpdatePRLabelError,
-} from "./customErrors.js";
+} from "../errors/index.js";
 import { SKIP_LABEL } from "../config/constants.js";
 
 /**
@@ -203,9 +203,7 @@ export const postPRComment = async (
       );
     }
   } else {
-    console.log(
-      `No comment posted to PR #${prNumber} due to empty comment`
-    );
+    console.log(`No comment posted to PR #${prNumber} due to empty comment`);
   }
 };
 
@@ -264,7 +262,6 @@ export const createOrUpdateFile = async (
     });
     console.log(`File: ${path} ${sha ? "updated" : "created"} successfully.`);
   } catch (error) {
-
     if (!sha) {
       throw new CreateFileError();
     } else {
