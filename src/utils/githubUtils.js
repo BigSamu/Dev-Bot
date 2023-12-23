@@ -1,4 +1,4 @@
-import { Octokit } from "octokit";
+import { Octokit, App } from "octokit";
 
 import {
   PullRequestDataExtractionError,
@@ -340,4 +340,14 @@ export const getOcktokitClient = async (ghApp, owner, repo) => {
     { owner, repo }
   );
   return ghApp.getInstallationOctokit(installation.id);
+};
+
+export const createOctokitClient = async (installationId) => {
+  const appId = process.env.GITHUB_APP_IDENTIFIER;
+  const privateKey = process.env.GITHUB_APP_PRIVATE_KEY.replace(/\\n/g, '\n');
+
+  const app = new App({ appId, privateKey });
+  const installationAccessToken = await app.getInstallationAccessToken({ installationId });
+
+  return new Octokit({ auth: installationAccessToken });
 };

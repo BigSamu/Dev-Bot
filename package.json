@@ -37,8 +37,7 @@
     ]
   },
   "dependencies": {
-    "@octokit/app": "^14.0.2",
-    "@octokit/core": "^5.0.2",
+    "@octokit/webhooks": "^12.0.10",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "octokit": "^2.1.0"

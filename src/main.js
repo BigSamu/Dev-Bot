@@ -34,7 +34,6 @@ const ghApp = new App({ // GitHub App
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-setupWebhooks(ghApp);
 
 // Launch a web server to listen for GitHub webhooks
 const port = process.env.PORT || 3000;
@@ -44,6 +43,9 @@ const webhookUrl = `http://localhost:${port}${webhookPath}`;
 // 4) Subscribe webhook events to express server instance
 const webhookMiddleware = createNodeMiddleware(ghApp.webhooks, {path: webhookPath});
 app.use(webhookMiddleware);
+
+// 5) Setup 
+setupWebhooks(ghApp);
 
 // 8) Running instance of Express server in selected port
 app.listen(port, () => {
