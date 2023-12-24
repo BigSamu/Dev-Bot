@@ -1,6 +1,9 @@
 # PEM keys
 *.pem
 
+# coverage
+coverage/
+
 node_modules/
 dist/
 .env

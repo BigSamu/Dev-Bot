@@ -8,7 +8,7 @@ import {
   EntryTooLongError,
   ChangelogEntryMissingHyphenError,
   EmptyEntryDescriptionError,
-} from "./customErrors.js";
+} from "../errors/index.js";
 
 /**
  * Formats a changelog entry with its associated PR number and link.
@@ -38,13 +38,11 @@ export const prepareChangelogEntry = (changelogEntry, prNumber, prLink) => {
     if (prefix === "skip") {
       return ["", "skip"];
     } else {
-      if (!CHANGELOG_ENTRY_PREFIXES.includes(prefix.toLowerCase())){
+      if (!CHANGELOG_ENTRY_PREFIXES.includes(prefix.toLowerCase())) {
         throw new InvalidPrefixError(prefix);
-      }
-      else if (!text) {
+      } else if (!text) {
         throw new EmptyEntryDescriptionError(prefix);
-      }
-      else if (trimmedText.length > MAX_ENTRY_LENGTH) {
+      } else if (trimmedText.length > MAX_ENTRY_LENGTH) {
         throw new EntryTooLongError(text.length);
       }
     }
@@ -110,10 +108,8 @@ export const prepareChangesetEntriesContent = (changelogEntriesMap) => {
 
  */
 export const formatErrorMessage = (inputError) => {
-  const spacedName = inputError.name.replace(/([A-Z])/g, ' $1').trim();
+  const spacedName = inputError.name.replace(/([A-Z])/g, " $1").trim();
   const outputErrorMessage =
-    `### ❌ ${spacedName}\n`+
-    "\n"+
-    `${inputError.message}\n`
+    `### ❌ ${spacedName}\n` + "\n" + `${inputError.message}\n`;
   return outputErrorMessage;
 };

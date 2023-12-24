@@ -8,14 +8,27 @@ import {
   DeleteFileError,
   CategoryWithSkipOptionError,
   UpdatePRLabelError,
-} from "./customErrors.js";
+} from "../errors/index.js";
 import { SKIP_LABEL } from "../config/constants.js";
 
 /**
- * Extracts relevant data from a GitHub Pull Request from the GitHub action context.
+ * Extracts relevant data from a GitHub Pull Request provided as a payload. This function
+ * is typically used within the context of a GitHub Action to process pull request information.
  *
- * @returns {Object} Object containing pull request details.
- * @throws {PullRequestDataExtractionError} If data extraction fails.
+ * @param {Object} pr_payload - The payload object from a GitHub pull request event.
+ * @param {Object} pr_payload.base - The base object containing the target branch info.
+ * @param {Object} pr_payload.head - The head object containing the source branch info.
+ * @param {number} pr_payload.number - The number of the pull request.
+ * @param {string} pr_payload.body - The description or body of the pull request.
+ * @param {string} pr_payload.html_url - The HTML URL link to the pull request.
+ *
+ * @returns {Object} An object containing essential pull request details such as repository owner,
+ * repository name, base branch reference, head repository owner, head repository name, head branch reference,
+ * pull request number, description, and pull request link.
+ *
+ * @throws {PullRequestDataExtractionError} If data extraction from the payload fails, a custom error
+ * `PullRequestDataExtractionError` is thrown. This helps in isolating issues specific to data extraction
+ * process in the action's workflow.
  */
 export const extractPullRequestData = (pr_payload) => {
   try {
@@ -165,20 +178,15 @@ export const getErrorComment = (errorInput, formatErrorMessage) => {
  * @param {string} owner - Owner of the repository.
  * @param {string} repo - Repository name.
  * @param {number} prNumber - Pull request number.
- * @param {Error} errorInput - Error object that determines the comment to be posted.
- * @param {Function} getErrorComment - Function that generates a comment string for a given error object based on its properties.
+ * @param {string} comment - Comment to be posted.
  */
 export const postPRComment = async (
   octokit,
   owner,
   repo,
   prNumber,
-  errorInput,
-  getErrorComment,
-  formatErrorMessage
+  comment
 ) => {
-  const comment = getErrorComment(errorInput, formatErrorMessage);
-
   if (comment) {
     try {
       // Post a comment to the pull request
@@ -195,9 +203,7 @@ export const postPRComment = async (
       );
     }
   } else {
-    console.log(
-      `No comment posted to PR #${prNumber} due to error type: ${errorInput.name}`
-    );
+    console.log(`No comment posted to PR #${prNumber} due to empty comment`);
   }
 };
 
@@ -225,14 +231,6 @@ export const createOrUpdateFile = async (
   // File's SHA to check if file exists
   let sha, message;
   // Attempt to retrieve the file's SHA to check if it exists
-  console.log("------------------------------------");
-  console.log("owner", owner);
-  console.log("repo", repo);
-  console.log("prNumber", prNumber);
-  console.log("branchRef", branchRef);
-  console.log("path", path);
-  console.log("content", content);
-  console.log("------------------------------------");
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner,
@@ -243,14 +241,14 @@ export const createOrUpdateFile = async (
     sha = data?.sha;
   } catch (error) {
     if (error.status === 404) {
-      console.log("Changeset file not found. Proceeding to create a new one.");
+      console.log("File not found. Proceeding to create a new one.");
     } else {
       throw new GetGithubContentError();
     }
   }
   message = `${
     sha ? "update" : "create"
-  } changeset file ${prNumber}.yml for PR #${prNumber}`;
+  } file ${prNumber}.yml for PR #${prNumber}`;
   // Create or update the changeset file content
   try {
     await octokit.rest.repos.createOrUpdateFileContents({
@@ -264,7 +262,6 @@ export const createOrUpdateFile = async (
     });
     console.log(`File: ${path} ${sha ? "updated" : "created"} successfully.`);
   } catch (error) {
-    console.log(error);
     if (!sha) {
       throw new CreateFileError();
     } else {
