@@ -43,7 +43,7 @@ This process ensures a streamlined and automated approach to maintaining up-to-d
 
 ## Contributing
 
-Developers interested in contributing to this project can visit the [Developer Guide](docs/DEVELOPER_GUIDE.md) for instructions on how to set up the project in their local environment.
+Contributions to the `OpenSearch-bot` are welcome! See our [Developer Guide](docs/DEVELOPER_GUIDE.md) for instructions on how to set up the project in your local environment. If you have any suggestions for how to improve the app, please feel free to open an issue or submit a pull request.
 
 ## License
 
