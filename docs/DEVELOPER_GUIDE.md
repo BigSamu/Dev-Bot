@@ -110,9 +110,7 @@ Provide the URL of your fork of the `OpenSearch-bot` repository.
 To generate this URL, you will need to activate `ngrok`: 
 
 - Open your command line and start an `ngrok` tunnel with the command `ngrok http [port]`, replacing `[port]` with the port number your local server is running on (e.g., `ngrok http 3000`).
-  
 - Locate the "Forwarding" URL displayed by `ngrok` (e.g., `https://****-****.ngrok-free.app`).
-  
 - In the "Webhook URL" field on your GitHub App's configuration page, enter this `ngrok` forwarding URL followed by the API endpoint `/api/webhook`. This combination forms the complete webhook URL.
 
 Your Webhook URL should resemble the following format:
@@ -152,15 +150,12 @@ Once you have configured the app as outlined above, click the "Create GitHub App
 For the OAuth user authorization process, you will need to generate a **client secret:**
 
 - Under the "Client secrets" section, click the "Generate a new client secret" button.
-  
 - Copy this secret and store it in a secure location.
-  
 - Click the green "Save changes" button farther down the page.
 
 Additionally, your app requires a **private key** to authenticate itself with GitHub:
 
 - Scroll down to the "Private keys" section at the bottom of the settings page.
-  
 - Click "Generate a private key" and download the `.pem` file to a secure location.
 
 ## Complete Local Environment Setup
@@ -252,58 +247,45 @@ As mentioned above, in order to replicate the scenario the `OpenSearch-bot` is d
 
 ### Install the App on Your Base Repository
 
-Since you are already signed in to your main account, begin by installing your GitHub App on your base repository:
+Since you are already signed in to your main account, begin by installing your GitHub App on your base repository.
 
-- Navigate to the public page of your GitHub App:
-  
-  - Click on your profile photo at the top right of any GitHub page.
-  
-  - Select "Settings" from the dropdown menu.
-  
-  - On the next page, scroll down to the bottom of the menu on the left side of the page and click "Developer settings"
-  
-  - You should see your GitHub App listed under the "GitHub Apps" heading. Click on the "Edit" button beside your app.
-  
-  - At the bottom of the left menu on the edit page, you should see a menu option called "Public page". Click on this.
-  
-  - You will be taken to the public URL for your GitHub App. Be sure to record this URL, as you will need it to install your app on your second GitHub repository (see below).
+<!-- omit in toc -->
+#### Navigate to Your GitHub App's Public Page
 
-- Click on the green "Install" button.
+- Click on your profile photo at the top right of any GitHub page.
+- Select "Settings" from the dropdown menu.  
+- Scroll down to "Developer settings" at the bottom of the left side menu. 
+- Under the "GitHub Apps" heading, find your app and click "Edit".
+- In the edit page menu, select "Public page" to go to your GitHub App's public URL. Record this URL for future use.
 
+<!-- omit in toc -->
+#### Install the App
+
+- On the public page of your GitHub App, click the green "Install" button.
 - Select the account where you want to install the app.
-
-- Choose whether you want to install the app on all your repositories or only on select repositories.
-
+- Choose whether you want to install the app on all your repositories or only on select ones:
   - If you choose "Only select repositories", be sure that your base repository is included among your options.
-  
-- Click on the green "Install" button.
+- Confirm the installation by clicking on the green "Install" button.
 
 ### Sign In to a Second GitHub Account
 
 If you already own a second GitHub account, and you are also signed in to that second account:
 
 - Click on your profile photo at the top right of the screen.
-
 - Select the "Switch account" dropdown menu.
-
 - Find the account you want to switch to, and click on that account name.
 
 If you are not signed in to your second account:
 
 - Click on your profile photo.
-
 - Select "Add account".
-
 - Sign in to your second account.
 
 If you do not already own a second GitHub account, you will need to register one:
 
 - Click on your profile photo.
-  
 - Select "Sign out".
-  
 - On the "Select account to sign out" page, select "Sign out from all accounts".
-  
 - From GitHub's home page, follow the process to register a new account.
 
 ### Fork Your Base Repository and Install Your App
@@ -317,26 +299,20 @@ Once your fork has been created, navigate to the URL of your GitHub App and foll
 Now that your app is installed on your forked repository, return to your fork and commit a simple change. For example:
 
 - Select the "Add file" dropdown button from the main page of your fork.
-  
 - Select "Create new file".
-  
 - Name your file (e.g., "test.txt") and enter some text in the text area that says, "Enter file contents here".
-  
 - Click the green "Commit changes..." button.
-  
 - In the modal window that opens, click on the green "Commit changes" button.
 
 Next, open a pull request against your base repository:
 
 - Click on the "Contribute" dropdown menu button.
-  
 - You should see a message like "This branch is 1 commit ahead of" followed by the name of your base repository.
-  
 - Click on the green "Open pull request" button.
-  
 - On the next screen click on the green "Create pull request" button.
 
-**IMPORTANT:** For the GitHub App to work as intended, you will need to add a "## Changelog" heading in the "Add a description" text area. Below that heading, enter a hyphen followed by a space and one of the following prefixes: 
+**IMPORTANT:** For the GitHub App to work as intended, you will need to add a "## Changelog" heading in the "Add a description" text area. Below that heading, enter a hyphen followed by a space and one of the following prefixes:
+
  - breaking
  - chore
  - deprecate
@@ -351,7 +327,7 @@ Next, open a pull request against your base repository:
 
 After the prefix, add a colon and then a brief description of your changes. Your description should look something like this:
 
-```
+```markdown
 ## Changelog
 
 - doc: Add test.txt
