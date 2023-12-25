@@ -13,6 +13,7 @@ This project contains the source code for a GitHub App that automates the releas
   - [Installing on an OpenSearch Repository](#installing-on-an-opensearch-repository)
   - [Installing on Forked Repositories](#installing-on-forked-repositories)
 - [Features](#features)
+- [Contributing](#contributing)
 - [License](#license)
 
 ## Installation
@@ -40,6 +41,10 @@ The app works as follows:
 
 This process ensures a streamlined and automated approach to maintaining up-to-date release documentation in OpenSearch repositories.
 
+## Contributing
+
+Developers interested in contributing to this project can visit the [Developer Guide](docs/DEVELOPER_GUIDE.md) for instructions on how to set up the project in their local environment.
+
 ## License
 
-This app is licensed under the MIT License.
+This app is licensed under the [MIT License](LICENSE).
