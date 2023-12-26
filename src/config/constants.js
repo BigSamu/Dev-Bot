@@ -1,4 +1,7 @@
 
+// 0) Load environment variables from .env file
+dotenv.config();
+
 /**
  * ****************************************************
  * I) CHANGELOG ENTRY PREFIXES
@@ -76,12 +79,11 @@ export const ENTRY_FORMATTING_PATTERN_REGEX = new RegExp(
  */
 export const MAX_ENTRY_LENGTH = 100;
 
-/**
- * GitHub authentication token used for accessing the GitHub API.
- * It is expected to be set as an environment variable.
- * @type {string}
- */
-export const GITHUB_TOKEN = process.env.INPUT_TOKEN;
+export const GITHUB_APP_IDENTIFIER = process.env.GITHUB_APP_IDENTIFIER;
+// export const GITHUB_APP_PRIVATE_KEY_PATH = process.env.GITHUB_APP_PRIVATE_KEY_PATH;
+export const GITHUB_APP_WEBHOOK_SECRET = process.env.GITHUB_APP_WEBHOOK_SECRET;
+// Export const GITHUB_APP_PRIVATE_KEY = fs.readFileSync(privateKeyPath, "utf8");
+export const GITHUB_APP_PRIVATE_KEY = process.env.GITHUB_APP_PRIVATE_KEY;
 
 /**
  * The file path where the changeset will be stored or updated.

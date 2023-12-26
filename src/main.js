@@ -2,53 +2,55 @@
 // SERVER INITIALIZATION AND CONFIGURATION SETUP
 // ---------------------------------------------------
 
-import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
 import { App } from "octokit";
-import { createNodeMiddleware } from "@octokit/webhooks";
+import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
+
+import releaseNotesRouter from "./routes/releaseNotes.routes.js";
+
+import {
+  GITHUB_APP_IDENTIFIER,
+  GITHUB_APP_PRIVATE_KEY,
+  GITHUB_APP_WEBHOOK_SECRET,
+} from "./utils/constants.js";
 
 import setupWebhooks from "./config/webhooks.js";
 
-// 1) Load environment variables from .env file
-dotenv.config();
-
-// 2) Set configured values
-const appId = process.env.GITHUB_APP_IDENTIFIER;
-// const privateKeyPath = process.env.PRIVATE_KEY_PATH;
-const secret = process.env.GITHUB_APP_WEBHOOK_SECRET;
-// const privateKey = fs.readFileSync(privateKeyPath, "utf8");
-const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-
-// 2) Intiliazing Express and GitHub App instances
+// 2) Intiliazing Express, GitHub App and Webhooks instances
 const app = express(); // Express server
-const ghApp = new App({ // GitHub App
-  appId: appId,
-  privateKey: privateKey,
-  webhooks: {
-    secret,
-  },
+const ghApp = new App({
+  appId: GITHUB_APP_IDENTIFIER,
+  privateKey: GITHUB_APP_PRIVATE_KEY,
+});
+
+const webhooks = new Webhooks({
+  secret: GITHUB_APP_WEBHOOK_SECRET
 });
 
 // 3) Enabling settings for being able to read JSON and parse url encoded data in requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-// Launch a web server to listen for GitHub webhooks
+// 4) Defining port and webhook path
 const port = process.env.PORT || 3000;
 const webhookPath = "/api/webhook";
-const webhookUrl = `http://localhost:${port}${webhookPath}`;
 
-// 4) Subscribe webhook events to express server instance
-const webhookMiddleware = createNodeMiddleware(ghApp.webhooks, {path: webhookPath});
+// 5) Subscribe webhook events to express server instance
+const webhookMiddleware = createNodeMiddleware(webhooks, {
+  path: webhookPath,
+});
 app.use(webhookMiddleware);
 
-// 5) Setup 
+// 6) Setup Webhooks Events Handlers
 setupWebhooks(ghApp);
 
-// 8) Running instance of Express server in selected port
+// 7) Importing API routes and incorporating them to 'app' instance
+app.use('/api/release-notes', releaseNotesRouter);
+
+
+// 7) Running instance of Express server in selected port
 app.listen(port, () => {
-  console.log(`Server is listening for events at: ${webhookUrl}`);
+  console.log(`Server is listening in port: ${port}`);
   console.log("Press Ctrl + C to quit.");
 });

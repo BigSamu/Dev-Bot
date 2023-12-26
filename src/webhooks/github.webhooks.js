@@ -1,18 +1,29 @@
-import { createOrUpdateChangesetFile } from "../controllers/changeset.controllers.js";
+import { createOrUpdateChangesetFile } from "../services/file.services.js";
 
 export const setupWebhooks = (ghApp) => {
   ghApp.webhooks.on("pull_request.opened", async ({ octokit, payload }) => {
     console.log(
       `Received a pull request creation event for #${payload.pull_request.number}`
     );
-    await createOrUpdateChangesetFile(ghApp, octokit, payload);
+    const {
+      owner,
+      repo,
+      branchRef,
+      prOwner,
+      prRepo,
+      prBranchRef,
+      prNumber,
+      prDescription,
+      prLink,
+    } = extractPullRequestData(payload.pull_request);
+    await createOrUpdateChangesetFile(octokit, payload);
   });
 
   ghApp.webhooks.on("pull_request.edited", async ({ octokit, payload }) => {
     console.log(
       `Received a pull request edition event for #${payload.pull_request.number}`
     );
-    await createOrUpdateChangesetFile(ghApp, octokit, payload);
+    await createOrUpdateChangesetFile(octokit, payload);
   });
 
   ghApp.webhooks.onError((error) => {
