@@ -101,3 +101,15 @@ export const SKIP_LABEL = "Skip-Changelog";
 * @type {string}
 */
 export const FAILED_CHANGESET_LABEL = "failed changeset";
+
+/**
+ * The comment that will be added to the PR if the changeset file was created successfully.
+ * @type {string}
+ */
+export const CHANGESET_SUCCESS_COMMENT = "### ✅ Success\n\nChangeset file created/updated\n";
+
+/**
+ * The comment that will be added to the PR if the changeset file was created successfully.
+ * @type {string}
+ */
+export const CHANGESET_SKIP_SUCCESS_COMMENT = "### ✅ Success\n\nCreation of changeset file skipped\n";
