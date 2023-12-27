@@ -9,7 +9,7 @@ import {
   CategoryWithSkipOptionError,
   UpdatePRLabelError,
 } from "../errors/index.js";
-import { SKIP_LABEL } from "../config/constants.js";
+import { SKIP_LABEL, FAILED_CHANGESET_LABEL } from "../config/constants.js";
 
 /**
  * Extracts relevant data from a GitHub Pull Request provided as a payload. This function
@@ -72,7 +72,7 @@ export const updatePRLabel = async (
   repo,
   prNumber,
   label,
-  addLabel
+  addLabel,
 ) => {
   try {
     // Get the current labels on the pull request
@@ -137,15 +137,19 @@ export const handleSkipOption = async (
   owner,
   repo,
   prNumber,
-  updateLabel
+  updateLabel,
 ) => {
   if (entryMap && Object.keys(entryMap).includes("skip")) {
     // Check if "skip" is the only prefix in the changeset entries
     if (Object.keys(entryMap).length > 1) {
+      // Removes "skip-changelog" label in PR if present
+      await updateLabel(octokit, owner, repo, prNumber, SKIP_LABEL, false);
       throw new CategoryWithSkipOptionError();
     } else {
       console.log("No changeset file created or updated.");
-      // Adds  "skip-changelog" label in PR if not present
+      // Removes "failed-changeset" label in PR if present
+      await updateLabel(octokit, owner, repo, prNumber, FAILED_CHANGESET_LABEL, false);
+      // Adds "skip-changelog" label in PR if not present
       await updateLabel(octokit, owner, repo, prNumber, SKIP_LABEL, true);
       // Indicates to index.js that the program should exit without creating or updating the changeset file
       return true;
