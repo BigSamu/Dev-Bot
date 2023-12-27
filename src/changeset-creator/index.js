@@ -2,6 +2,9 @@
 import {
   CHANGESET_PATH,
   FAILED_CHANGESET_LABEL,
+  CHANGESET_SUCCESS_COMMENT,
+  CHANGESET_SKIP_SUCCESS_COMMENT,
+  SKIP_LABEL,
 } from "../config/constants.js";
 import {
   processLine,
@@ -70,12 +73,19 @@ export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
       owner,
       repo,
       prNumber,
-      updatePRLabel
+      updatePRLabel,
     );
 
     // Skip changeset file creation if the "skip" label was added to the PR
     if (isSkipOptionPresent) {
       console.log("Skipping changeset creation because of 'skip' option.");
+      await postPRComment(
+        octokit,
+        owner,
+        repo,
+        prNumber,
+        CHANGESET_SKIP_SUCCESS_COMMENT
+      );
       return;
     }
 
@@ -105,6 +115,13 @@ export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
       FAILED_CHANGESET_LABEL,
       false
     );
+    await postPRComment(
+      octokit, 
+      owner, 
+      repo, 
+      prNumber, 
+      CHANGESET_SUCCESS_COMMENT
+    );
   } catch (error) {
     if (error.response) {
       console.error(
@@ -112,8 +129,18 @@ export const createOrUpdateChangesetFile = async (ghApp, octokit, payload) => {
       );
     } else {
       if (owner && repo && prNumber) {
-        const comment = getErrorComment(errorInput, formatErrorMessage);
+        const comment = getErrorComment(error, formatErrorMessage);
         await postPRComment(octokit, owner, repo, prNumber, comment);
+        // Remove the "skip" label if it was previously added to the PR
+        await updatePRLabel(
+          octokit,
+          owner,
+          repo,
+          prNumber,
+          SKIP_LABEL,
+          false
+        );
+        // Add the "failed-changeset" label to the PR
         await updatePRLabel(
           octokit,
           owner,
