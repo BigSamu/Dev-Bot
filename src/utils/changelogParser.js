@@ -47,6 +47,10 @@ export const processLine = (line, state) => {
  * @return {string[]} An array of changelog entry strings.
  */
 export const extractChangelogEntries = (prDescription, processLine) => {
+  // Throw error if PR description is missing
+  if(!prDescription) {
+    throw new InvalidChangelogHeadingError();
+  }
   // Match the changelog section using the defined regex
   const changelogSection = prDescription.match(CHANGELOG_SECTION_REGEX);
   // Output -> Array of length 2:
