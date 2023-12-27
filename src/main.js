@@ -45,7 +45,7 @@ const webhookUrl = `http://localhost:${port}${webhookPath}`;
 const webhookMiddleware = createNodeMiddleware(ghApp.webhooks, {path: webhookPath});
 app.use(webhookMiddleware);
 
-// 8) Running instance of Express server in selected port
+// 5) Running instance of Express server in selected port
 app.listen(port, () => {
   console.log(`Server is listening for events at: ${webhookUrl}`);
   console.log("Press Ctrl + C to quit.");
