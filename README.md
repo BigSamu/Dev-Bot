@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/OpenSearch-bot-logo.png" alt="OpenSearch-bot Logo" width="100" height="100">
+</p>
+
 <!-- omit in toc -->
 # OpenSearch-bot
 
