@@ -1,6 +1,3 @@
-<p align="center">
-  <img src="./assets/OpenSearch-bot-logo.png" alt="OpenSearch-bot Logo" width="100" height="100">
-</p>
 
 <!-- omit in toc -->
 # OpenSearch-bot
@@ -10,6 +7,10 @@
 ![Coverage Badge](./badges/coverage.svg)
 
 This project contains the source code for a GitHub App that automates the release process in OpenSearch repositories.
+
+<left>
+  <img src="./assets/OpenSearch-bot-logo.png" alt="OpenSearch-bot Logo" width="180" height="180">
+</left>
 
 <!-- omit in toc -->
 ## Table of Contents
@@ -27,7 +28,7 @@ In order for the app to work as intended, it must be installed both on an OpenSe
 <!-- omit from toc -->
 ### Installing on an OpenSearch Repository
 
-- Navigate to the [OpenSearch-bot](https://github.com/apps/opensearch-bot) installation page and click "Install". 
+- Navigate to the [OpenSearch-bot](https://github.com/apps/opensearch-bot) installation page and click "Install".
 - Select the OpenSearch repository where this app will manage PRs and process changeset files.
 - Follow the instructions to complete the installation.
 
@@ -42,7 +43,7 @@ In order for the app to work as intended, it must be installed both on an OpenSe
 The app works as follows:
 
 1. **PR Changelog Processing:** When a user opens or edits a pull request (PR) from a forked repository against an OpenSearch repository, the app scans the PR description, looking for changelog entries listed in a "Changelog" section. It then generates a changeset file from these entries and commits this file to the open PR.
-   
+
 2. **Automating Release Documentation:** When the PR is merged, the changeset file is stored in a designated directory in the base repository. At the time of a new release, the app scans this directory and uses the changeset files to generate comprehensive release notes and update the changelog with new entries.
 
 This process ensures a streamlined and automated approach to maintaining up-to-date release documentation in OpenSearch repositories.
