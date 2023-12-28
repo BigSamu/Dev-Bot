@@ -1,4 +1,41 @@
 /**
+ * Get a label from an issue or pull request in a GitHub repository.
+ *
+ * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
+ * @param {string} owner - Owner of the repository.
+ * @param {string} repo - Repository name.
+ * @param {number} issueOrPullRequestNumber - Issue or pull request number.
+ * @param {string} label - Label to be retrieved.
+ * @returns {Promise<Object>} A Promise that resolves with the label data.
+ * @throws {Error} - If an error occurs while retrieving the label.
+ */
+export const getOneLabel = async (
+  octokit,
+  owner,
+  repo,
+  issueOrPullRequestNumber,
+  label
+) => {
+  try {
+    // Get the label from the issue or pull request
+    const { data } = await octokit.rest.issues.getLabel({
+      owner,
+      repo,
+      issue_number: issueOrPullRequestNumber,
+      name: label,
+    });
+
+    console.log(
+      `Label "${label}" retrieved from Issue/PR #${issueOrPullRequestNumber}`
+    );
+    return data;
+  } catch (error) {
+    console.error("Error retrieving label:", error.message);
+    throw error; // Re-throw the error to be handled by the caller
+  }
+};
+
+/**
  * Get information about a label in a GitHub repository.
  *
  * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
@@ -42,7 +79,6 @@ export const addLabel = async (
   issueOrPullRequestNumber,
   label
 ) => {
-
   try {
     // Add the label to the issue or pull request
     await octokit.rest.issues.addLabels({
@@ -57,8 +93,9 @@ export const addLabel = async (
     );
   } catch (error) {
     console.error("Error adding label:", error.message);
+    throw error;
   }
-}
+};
 
 /**
  * Remove a label from an issue or pull request in a GitHub repository.
@@ -91,6 +128,11 @@ export const removeLabel = async (
       `Label "${label}" removed from Issue/PR #${issueOrPullRequestNumber}`
     );
   } catch (error) {
+    if (error.status === 404) {
+      console.log(`Label "${label}" not found. No need to remove label.`);
+      return;
+    }
     console.error("Error removing label:", error.message);
+    throw error;
   }
-}
+};

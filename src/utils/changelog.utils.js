@@ -75,7 +75,9 @@ export const extractChangelogEntries = (
           changelogEntries.length === 1 ? "entry" : "entries"
         }:`
       );
-      console.log(changelogEntries);
+      for (const eachEntry of changelogEntries){
+         console.log(`${eachEntry}`);
+      }
       return changelogEntries;
     }
   } catch (error) {

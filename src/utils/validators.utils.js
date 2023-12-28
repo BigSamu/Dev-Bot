@@ -48,19 +48,18 @@ export const isValidChangelogSection = (changelogSection) => {
  * @throws {EntryTooLongError} When the changelog entry exceeds the maximum allowed length.
  * @throws {ChangelogEntryMissingHyphenError} When the changelog entry does not match the expected format.
  */
-export const isValidChangelogEntry = (changelogEntry) => {
+export const isValidChangelogEntry = (changelogEntry, totalEntries) => {
   const [, marker, prefix, log] = changelogEntry.match(
     ENTRY_FORMATTING_PATTERN_REGEX
   );
-
   const trimmedLog = log ? log.trim() : "";
   if (marker !== "-") {
     throw new ChangelogEntryMissingHyphenError();
   } else if (!CHANGELOG_ENTRY_PREFIXES.includes(prefix.toLowerCase())) {
     throw new InvalidPrefixError(prefix);
-  } else if (prefix === "skip" && numberOfEntries > 1) {
+  } else if (prefix === "skip" && totalEntries > 1) {
     throw new CategoryWithSkipOptionError();
-  } else if (!log) {
+  } else if (prefix !== "skip" && !log) {
     throw new EmptyEntryDescriptionError(prefix);
   } else if (trimmedLog.length > MAX_ENTRY_LENGTH) {
     throw new EntryTooLongError(log.length);

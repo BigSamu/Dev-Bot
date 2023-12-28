@@ -1,4 +1,3 @@
-
 /**
  * Formats an error message with specific styling and returns it as an HTML string.
  * It transforms the PascalCase 'name' of the error to spaced string, makes it bold,
@@ -11,11 +10,14 @@
  *
 
  */
-export const formatErrorMessage = (inputError) => {
-  const spacedName = inputError.name.replace(/([A-Z])/g, " $1").trim();
-  const outputErrorMessage =
-    `### ❌ ${spacedName}\n` + "\n" + `${inputError.message}\n`;
-  return outputErrorMessage;
+export const formatPostComment = ({ input, type }) => {
+  if (type === "ERROR" && input.shouldResultInPRComment) {
+    const spacedName = input.name.replace(/([A-Z])/g, " $1").trim();
+    const outputErrorMessage =
+      `### ❌ ${spacedName}\n` + "\n" + `${input.message}\n`;
+    return outputErrorMessage;
+  }
+  return input.message;
 };
 
 /**
@@ -26,8 +28,8 @@ export const formatErrorMessage = (inputError) => {
  *                   otherwise returns the original input.
  */
 export const capitalize = (str) => {
-  if (str && typeof str === 'string') {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+  if (str && typeof str === "string") {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
   return str;
-}
+};

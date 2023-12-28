@@ -25,10 +25,14 @@ import { capitalize } from "./formatting.utils.js";
  */
 export const getChangesetEntriesMap = (changelogEntries, prNumber, prLink) => {
   const changesetEntryMap = {};
+  const totalEntries = changelogEntries.length;
   for (const changelogEntry of changelogEntries) {
     let prefix, trimmedLog;
     try {
-      ({ prefix, trimmedLog } = isValidChangelogEntry(changelogEntry));
+      ({ prefix, trimmedLog } = isValidChangelogEntry(
+        changelogEntry,
+        totalEntries
+      ));
     } catch (error) {
       console.error("Error: " + error.message);
       throw error;

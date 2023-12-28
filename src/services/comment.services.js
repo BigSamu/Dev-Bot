@@ -12,7 +12,7 @@
 export async function postComment(octokit, owner, repo, issueOrPullRequestNumber, comment) {
   try {
     // Create the comment on the issue or pull request
-    await octokit.issues.createComment({
+    await octokit.rest.issues.createComment({
       owner,
       repo,
       issue_number: issueOrPullRequestNumber,

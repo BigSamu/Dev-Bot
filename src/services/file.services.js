@@ -5,17 +5,17 @@
  * @param {string} owner - The repository owner.
  * @param {string} repo - The repository name.
  * @param {string} branch - The branch name.
- * @param {string} filePath - The file path.
+ * @param {string} path - The file path.
  * @returns {Promise<object>} - An object containing the file details.
  * @throws {Error} - If an error occurs while fetching the file.
  */
-export const getFileByPath = async (octokit, owner, repo, branch, filePath) => {
+export const getFileByPath = async (octokit, owner, repo, branch, path) => {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner: owner,
       repo: repo,
       ref: branch,
-      path: filePath,
+      path: path,
     });
 
     if (Array.isArray(data)) {
@@ -29,10 +29,9 @@ export const getFileByPath = async (octokit, owner, repo, branch, filePath) => {
       content: data.content,
       sha: data.sha,
     };
-
   } catch (error) {
     if (error.status === 404) {
-      console.log(`File '${filePath}' not found.`);
+      console.log(`File '${path}' not found.`);
       return;
     } else {
       console.error("Error fetching file:", error);
@@ -96,7 +95,7 @@ export const getAllFilesByPath = async (
  * @param {string} owner - The repository owner.
  * @param {string} repo - The repository name.
  * @param {string} branch - The branch name.
- * @param {string} filePath - The file path.
+ * @param {string} path - The file path.
  * @param {string} content - The file content.
  * @param {string} message - The commit message.
  * @returns {Promise<object>} - An object containing the created or updated file details.
@@ -107,27 +106,29 @@ export const createOrUpdateFileByPath = async (
   owner,
   repo,
   branch,
-  filePath,
-  fileContent,
-  commitMessage,
-  fileSha
+  path,
+  content,
+  message,
+  sha
 ) => {
   try {
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: owner,
       repo: repo,
       branch: branch,
-      path: filePath,
-      message: commitMessage,
-      content: Buffer.from(fileContent).toString("base64"),
-      sha: fileSha || undefined,
+      path: path,
+      message: message,
+      content: Buffer.from(content).toString("base64"),
+      sha: sha,
     });
     console.log(
-      `File '${filePath}' ${sha ? "created" : "updated"} successfully.`
+      `File '${path}' ${path ? "updated" : "created"} successfully.`
     );
-    return "sucess";
   } catch (error) {
-    console.error("Error creating or updating file:", error);
+    console.error(
+      `Error ${path ? "updating" : "creating"} file: `,
+      error.message
+    );
     throw error;
   }
 };
@@ -139,7 +140,7 @@ export const createOrUpdateFileByPath = async (
  * @param {string} owner - The repository owner.
  * @param {string} repo - The repository name.
  * @param {string} branch - The branch name.
- * @param {string} filePath - The file path.
+ * @param {string} path - The file path.
  * @param {string} sha - The file SHA.
  * @param {string} message - The commit message.
  * @returns {Promise<void>} A Promise that resolves when the file is deleted.
@@ -150,21 +151,25 @@ export const deleteFileByPath = async (
   owner,
   repo,
   branch,
-  filePath,
-  sha,
-  message
+  path,
+  message,
+  sha
 ) => {
   try {
     await octokit.rest.repos.deleteFile({
       owner: owner,
       repo: repo,
-      path: filePath,
+      path: path,
       message: message,
       sha: sha,
       branch: branch,
     });
-    console.log(`File '${filePath}' deleted successfully.`);
+    console.log(`File '${path}' deleted successfully.`);
   } catch (error) {
+    if(error.status === 404) {
+      console.log(`File '${path}' not found. No need to delete file.`);
+      return;
+    }
     console.error("Error deleting file:", error);
     throw error;
   }

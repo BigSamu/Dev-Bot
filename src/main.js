@@ -10,40 +10,37 @@ import releaseNotesRouter from "./routes/releaseNotes.routes.js";
 
 import {
   GITHUB_APP_WEBHOOK_SECRET,
+  PORT,
+  API_PATH_SUFFIX,
 } from "./config/constants.js";
-
 
 import { setupWebhooks } from "./webhooks/github.webhooks.js";
 
-// 2) Intiliazing Express, GitHub App and Webhooks instances
+// 2) Intiliazing express instance
 const app = express(); // Express server
+
+// 5) Setup webhook middleware
+const webhookUrl = `${API_PATH_SUFFIX}/webhooks`;
 const webhooks = new Webhooks({
   secret: GITHUB_APP_WEBHOOK_SECRET,
 });
-
-
-// 3) Enabling settings for being able to read JSON and parse url encoded data in requests
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// 4) Defining port and webhook path
-const port = process.env.PORT || 3000;
-const webhookPath = "/api/webhooks";
-
-// 6) Setup Webhooks Events Handlers
-setupWebhooks(webhooks);
-
-// 5) Subscribe webhook events to express server instance
 const webhookMiddleware = createNodeMiddleware(webhooks, {
-  path: webhookPath,
+  path: webhookUrl,
 });
 app.use(webhookMiddleware);
 
-// 7) Importing API routes and incorporating them to 'app' instance
-app.use("/api", releaseNotesRouter);
+// 3) Setup body-parsing  middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 7) Running instance of Express server in selected port
-app.listen(port, () => {
-  console.log(`Server is listening in port: ${port}`);
+// 4) Setup webhook events handlers
+setupWebhooks(webhooks, webhookUrl);
+
+// 5) Suscribe API routes
+app.use(API_PATH_SUFFIX, releaseNotesRouter);
+
+// 6) Running instance of Express server in selected port
+app.listen(PORT, () => {
+  console.log(`Server is listening in port: ${PORT}`);
   console.log("Press Ctrl + C to quit.");
 });

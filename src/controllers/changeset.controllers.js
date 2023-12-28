@@ -5,12 +5,11 @@ import {
 } from "../config/constants.js";
 import {
   getFileByPath,
-  getAllFilesByPath,
   createOrUpdateFileByPath,
   deleteFileByPath,
-  deleteAllFilesByPath,
   addLabel,
   removeLabel,
+  postComment,
   getOcktokitClient,
 } from "../services/index.js";
 
@@ -21,6 +20,7 @@ import {
   getChangesetEntriesMap,
   getChangesetFileContent,
   isSkipEntry,
+  formatPostComment,
 } from "../utils/index.js";
 
 export const createOrUpdateChangesetFile = async (payload) => {
@@ -53,30 +53,18 @@ export const createOrUpdateChangesetFile = async (payload) => {
     baseOctokit = await getOcktokitClient(baseOwner, baseRepo);
     headOctokit = await getOcktokitClient(headOwner, headRepo);
 
-    // Step 1 - Extract changelog entries from the PR description and return array
+    // Step 1 - Parse changelog entries and validate
     const changelogEntries = extractChangelogEntries(
       prDescription,
       processChangelogLine
     );
-
-    // Step 2 - Validate changelog entries and return a map of formatted entries
     const changesetEntriesMap = getChangesetEntriesMap(
       changelogEntries,
       prNumber,
       prLink
     );
 
-    // Step 3 - Handle if an "skip" option exist. If it does, no changeset file is created or updated
-    if (isSkipEntry(changesetEntriesMap)) {
-      await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
-      console.log("Skip option found. No changeset file created or updated.");
-      return;
-    }
-
-    // Step 4 - Prepare changeset file content
-    let changesetFileContent = getChangesetFileContent(changesetEntriesMap);
-
-    // Step 5 - Add or update the changeset file in baseed baseRepo
+    // Step 2 - Handle "skip" option
     const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
     const changesetFile = await getFileByPath(
       headOctokit,
@@ -85,12 +73,38 @@ export const createOrUpdateChangesetFile = async (payload) => {
       headBranch,
       changesetFilePath
     );
+    if (isSkipEntry(changesetEntriesMap)) {
+      await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
+      console.log("Skip option found. No changeset file created or updated.");
+      const commitMessage = `changeset file for PR #${prNumber} deleted`;
+      await deleteFileByPath(
+        headOctokit,
+        headOwner,
+        headRepo,
+        headBranch,
+        changesetFilePath,
+        commitMessage,
+        changesetFile?.sha
+      );
+      // Clear 'failed changeset' label if exists
+      await removeLabel(
+        baseOctokit,
+        baseOwner,
+        baseRepo,
+        prNumber,
+        FAILED_CHANGESET_LABEL
+      );
+      return;
+    }
+
+    // Step 3 - Add or update the changeset file in head repo
     if (!changesetFile) {
       console.log(
         "No changeset file found. Proceding to create new changeset file..."
       );
     }
-    const changesetFileSha = (changesetFile) ? changesetFileSha.sha : undefined;
+    const changesetFileContent = getChangesetFileContent(changesetEntriesMap);
+    const changesetFileSha = changesetFile ? changesetFile.sha : undefined;
     const commitMessage = `changeset file for PR #${prNumber} ${
       changesetFileSha ? "updated" : "created"
     }`;
@@ -99,23 +113,24 @@ export const createOrUpdateChangesetFile = async (payload) => {
       headOwner,
       headRepo,
       headBranch,
-      commitMessage,
       changesetFilePath,
       changesetFileContent,
+      commitMessage,
       changesetFileSha
     );
 
-    // Step 6 - Removing Labels if exist
-    // await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
-    // await removeLabel(
-    //   baseOctokit,
-    //   baseOwner,
-    //   baseRepo,
-    //   prNumber,
-    //   FAILED_CHANGESET_LABEL
-    // );
+    // Step 4 - Clean labels if exist
+    await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
+    await removeLabel(
+      baseOctokit,
+      baseOwner,
+      baseRepo,
+      prNumber,
+      FAILED_CHANGESET_LABEL
+    );
   } catch (error) {
-    console.error("Error: " + error.message);
+    const errorComment = formatPostComment({ input: error, type: "ERROR" });
+    await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
     await addLabel(
       baseOctokit,
       baseOwner,
@@ -123,6 +138,8 @@ export const createOrUpdateChangesetFile = async (payload) => {
       prNumber,
       FAILED_CHANGESET_LABEL
     );
-    throw error;
+    // Clear skip label if exists
+    await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
+    throw new Error("Error creating or updating changeset file.");
   }
 };
