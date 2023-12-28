@@ -5,7 +5,7 @@ import {
   deleteFileByPath,
   deleteAllFilesByPath,
   getOcktokitClient,
-} from "../services";
+} from "../services/index.js";
 
 export const processReleaseNotes = async (req, res) => {
   // Complete this function

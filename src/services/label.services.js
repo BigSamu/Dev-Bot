@@ -35,16 +35,17 @@ export async function getLabel(octokit, owner, repo, labelName) {
  * @returns {Promise<void>} A Promise that resolves when the label is added.
  * @throws {Error} - If an error occurs while adding the label.
  */
-export async function addLabel(
+export const addLabel = async (
   octokit,
   owner,
   repo,
   issueOrPullRequestNumber,
   label
-) {
+) => {
+
   try {
     // Add the label to the issue or pull request
-    await octokit.issues.addLabels({
+    await octokit.rest.issues.addLabels({
       owner,
       repo,
       issue_number: issueOrPullRequestNumber,
@@ -55,8 +56,7 @@ export async function addLabel(
       `Label "${label}" added to Issue/PR #${issueOrPullRequestNumber}`
     );
   } catch (error) {
-    console.error("Error adding label:", error);
-    throw error;
+    console.error("Error adding label:", error.message);
   }
 }
 
@@ -71,16 +71,16 @@ export async function addLabel(
  * @returns {Promise<void>} A Promise that resolves when the label is removed.
  * @throws {Error} - If an error occurs while removing the label.
  */
-export async function removeLabel(
+export const removeLabel = async (
   octokit,
   owner,
   repo,
   issueOrPullRequestNumber,
   label
-) {
+) => {
   try {
     // Remove the label from the issue or pull request
-    await octokit.issues.removeLabel({
+    await octokit.rest.issues.removeLabel({
       owner,
       repo,
       issue_number: issueOrPullRequestNumber,
@@ -91,7 +91,6 @@ export async function removeLabel(
       `Label "${label}" removed from Issue/PR #${issueOrPullRequestNumber}`
     );
   } catch (error) {
-    console.error("Error removing label:", error);
-    throw error;
+    console.error("Error removing label:", error.message);
   }
 }

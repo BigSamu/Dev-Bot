@@ -1,4 +1,6 @@
 
+import dotenv from 'dotenv';
+
 // 0) Load environment variables from .env file
 dotenv.config();
 
@@ -56,7 +58,7 @@ export const CHANGELOG_SECTION_REGEX = new RegExp(
  * @type {RegExp}
  */
 export const ENTRY_FORMATTING_PATTERN_REGEX = new RegExp(
-  `-\\s*([a-zA-Z0-9]+):?(.*)?`
+  `([^a-zA-Z])?\\s*([a-zA-Z0-9]+):?(.*)?`
 );
 // Explanation:
 // - '-\\s*' matches a hyphen followed by any number of whitespace characters up until the first capturing group.

@@ -17,3 +17,17 @@ export const formatErrorMessage = (inputError) => {
     `### ❌ ${spacedName}\n` + "\n" + `${inputError.message}\n`;
   return outputErrorMessage;
 };
+
+/**
+ * Capitalizes the first letter of a given string.
+ *
+ * @param {string} str - The string to be capitalized.
+ * @returns {string} The capitalized string if the input is a valid string,
+ *                   otherwise returns the original input.
+ */
+export const capitalize = (str) => {
+  if (str && typeof str === 'string') {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  return str;
+}

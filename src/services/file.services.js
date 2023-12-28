@@ -12,8 +12,8 @@
 export const getFileByPath = async (octokit, owner, repo, branch, filePath) => {
   try {
     const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       ref: branch,
       path: filePath,
     });
@@ -29,9 +29,15 @@ export const getFileByPath = async (octokit, owner, repo, branch, filePath) => {
       content: data.content,
       sha: data.sha,
     };
+
   } catch (error) {
-    console.error("Error fetching file:", error);
-    throw error;
+    if (error.status === 404) {
+      console.log(`File '${filePath}' not found.`);
+      return;
+    } else {
+      console.error("Error fetching file:", error);
+      throw error;
+    }
   }
 };
 
@@ -48,11 +54,17 @@ export const getFileByPath = async (octokit, owner, repo, branch, filePath) => {
  *
  */
 
-export const getAllFilesByPath = async (octokit, owner, repo, branch, directoryPath) => {
+export const getAllFilesByPath = async (
+  octokit,
+  owner,
+  repo,
+  branch,
+  directoryPath
+) => {
   try {
     const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       ref: branch,
       path: directoryPath,
     });
@@ -96,30 +108,26 @@ export const createOrUpdateFileByPath = async (
   repo,
   branch,
   filePath,
-  content,
-  message,
-  sha
+  fileContent,
+  commitMessage,
+  fileSha
 ) => {
   try {
-    const { data } = await octokit.rest.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      ref: branch,
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner: owner,
+      repo: repo,
+      branch: branch,
       path: filePath,
-      message,
-      content: Buffer.from(content).toString("base64"),
-      sha,
+      message: commitMessage,
+      content: Buffer.from(fileContent).toString("base64"),
+      sha: fileSha || undefined,
     });
-
-    return {
-      name: data.content.name,
-      path: data.content.path,
-      download_url: data.content.download_url,
-      content: data.content.content,
-      sha: data.content.sha,
-    };
+    console.log(
+      `File '${filePath}' ${sha ? "created" : "updated"} successfully.`
+    );
+    return "sucess";
   } catch (error) {
-    console.error("Error creating file:", error);
+    console.error("Error creating or updating file:", error);
     throw error;
   }
 };
@@ -148,13 +156,14 @@ export const deleteFileByPath = async (
 ) => {
   try {
     await octokit.rest.repos.deleteFile({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       path: filePath,
-      message,
-      sha,
-      branch,
+      message: message,
+      sha: sha,
+      branch: branch,
     });
+    console.log(`File '${filePath}' deleted successfully.`);
   } catch (error) {
     console.error("Error deleting file:", error);
     throw error;
@@ -184,42 +193,44 @@ export async function deleteAllFilesByPath(
   try {
     // Get the current tree for the branch
     const { data: currentTree } = await octokit.git.getTree({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       tree_sha: branch,
       recursive: true, // Recursively get all files in the tree
     });
 
     // Filter the current tree to exclude the files in the specified directory
-    const filteredTree = currentTree.tree.filter((item) => !item.path.startsWith(directoryPath));
+    const filteredTree = currentTree.tree.filter(
+      (item) => !item.path.startsWith(directoryPath)
+    );
 
     // Create a new tree containing the filtered files
     const { data: newTree } = await octokit.git.createTree({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       tree: filteredTree,
     });
 
     // Get the current commit for the branch
     const { data: currentCommit } = await octokit.git.getCommit({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       commit_sha: branch,
     });
 
     // Create a new commit that points to the new tree
     const { data: newCommit } = await octokit.git.createCommit({
-      owner,
-      repo,
-      message,
+      owner: owner,
+      repo: repo,
+      message: message,
       tree: newTree.sha,
       parents: [currentCommit.sha],
     });
 
-    // Update the branch reference to the new commit
+    // Update the branch brancherence to the new commit
     await octokit.git.updateRef({
-      owner,
-      repo,
+      owner: owner,
+      repo: repo,
       ref: `heads/${branch}`,
       sha: newCommit.sha,
     });

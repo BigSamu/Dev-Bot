@@ -1,3 +1,9 @@
+
+import { App } from 'octokit';
+import{
+  GITHUB_APP_IDENTIFIER,
+  GITHUB_APP_PRIVATE_KEY,
+} from '../config/constants.js';
 /**
  * Creates an authenticated Octokit instance for a given GitHub App installation.
  * This function performs asynchronous operations to obtain the installation ID and
@@ -9,8 +15,9 @@
  * @throws {Error} - If an error occurs while obtaining the installation ID.
  */
 export const getOcktokitClient = async (owner, repo) => {
+
   const ghApp = new App({
-    id: GITHUB_APP_IDENTIFIER,
+    appId: GITHUB_APP_IDENTIFIER,
     privateKey: GITHUB_APP_PRIVATE_KEY,
   });
 
