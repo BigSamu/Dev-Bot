@@ -9,7 +9,7 @@
     "node": ">=18.x"
   },
   "scripts": {
-    "server": "node src/main.js",
+    "dev": "node src/main.js",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg"
   },
   "jest": {
