@@ -39,6 +39,15 @@ setupWebhooks(webhooks, webhookUrl);
 // 6) Suscribe API routes
 app.use(API_PATH_SUFFIX, releaseNotesRouter);
 
+<<<<<<< HEAD
+// 7) Running instance of Express server in selected port
+app.listen(PORT, () => {
+  console.log(`Server is listening in port: ${PORT}`);
+=======
+// 4) Subscribe webhook events to express server instance
+const webhookMiddleware = createNodeMiddleware(ghApp.webhooks, {path: webhookPath});
+app.use(webhookMiddleware);
+
 // 7) Running instance of Express server in selected port
 app.listen(PORT, () => {
   console.log(`Server is listening in port: ${PORT}`);
