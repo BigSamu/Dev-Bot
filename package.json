@@ -9,7 +9,7 @@
     "node": ">=18.x"
   },
   "scripts": {
-    "server": "node src/main.js",
+    "dev": "node src/main.js",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg"
   },
   "jest": {
@@ -37,7 +37,6 @@
     ]
   },
   "dependencies": {
-    "@octokit/rest": "^20.0.2",
     "@octokit/webhooks": "^12.0.10",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
