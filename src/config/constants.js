@@ -1,7 +1,7 @@
 
 import dotenv from 'dotenv';
 
-// 0) Load environment variables from .env file
+// Load environment variables from .env file
 dotenv.config();
 
 export const ENVIRONMENT = process.env.NODE_ENV;
@@ -39,7 +39,7 @@ export const CHANGELOG_ENTRY_PREFIXES = [
  */
 
 /**
- * Define regex pattern for the changelog heading.
+ * Regex pattern to match the changelog heading.
  * @type {string}
  */
 export const CHANGELOG_HEADING = "## Changelog";
@@ -52,7 +52,7 @@ export const CHANGELOG_SECTION_REGEX = new RegExp(
   `${CHANGELOG_HEADING}\\s*([\\s\\S]*?)(?:\\n##|$)`
 );
 // Explanation:
-// - 'CHANGELOG_HEADING' Matches the '## Changelog' heading in markdown.
+// - 'CHANGELOG_HEADING' matches the '## Changelog' heading in markdown.
 // - '\s*' matches any whitespace character following '## Changelog'.
 // - '([\s\S]*?)' is a non-greedy capturing group that matches all characters, either whitespace or non-whitespace, up until the next section heading.
 // - '(?:\n##|$)' is a non-capturing group that matches either a section heading or the end of the string.
@@ -86,14 +86,11 @@ export const ENTRY_FORMATTING_PATTERN_REGEX = new RegExp(
 export const MAX_ENTRY_LENGTH = 100;
 
 export const GITHUB_APP_IDENTIFIER = process.env.GITHUB_APP_IDENTIFIER;
-// export const GITHUB_APP_PRIVATE_KEY_PATH = process.env.GITHUB_APP_PRIVATE_KEY_PATH;
 export const GITHUB_APP_WEBHOOK_SECRET = process.env.GITHUB_APP_WEBHOOK_SECRET;
-// Export const GITHUB_APP_PRIVATE_KEY = fs.readFileSync(privateKeyPath, "utf8");
 export const GITHUB_APP_PRIVATE_KEY = process.env.GITHUB_APP_PRIVATE_KEY;
 
 /**
- * The file path where the changeset will be stored or updated.
- * This path is read from an environment variable.
+ * The file path where the changeset files will be stored or updated.
  * @type {string}
  */
 export const CHANGESET_PATH = "changelogs/fragments";
@@ -105,19 +102,7 @@ export const CHANGESET_PATH = "changelogs/fragments";
 export const SKIP_LABEL = "Skip-Changelog";
 
 /**
-* The label that will be added to the PR if the "skip" option is used.
+* The label that will be added to the PR if the process fails.
 * @type {string}
 */
 export const FAILED_CHANGESET_LABEL = "failed changeset";
-
-/**
- * The comment that will be added to the PR if the changeset file was created successfully.
- * @type {string}
- */
-export const CHANGESET_SUCCESS_COMMENT = "### ✅ Success\n\nChangeset file created/updated\n";
-
-/**
- * The comment that will be added to the PR if the changeset file was created successfully.
- * @type {string}
- */
-export const CHANGESET_SKIP_SUCCESS_COMMENT = "### ✅ Success\n\nCreation of changeset file skipped\n";
