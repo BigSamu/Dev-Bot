@@ -15,13 +15,11 @@ import{
  * @throws {Error} - If an error occurs while obtaining the installation ID.
  */
 export const getOcktokitClient = async (owner, repo) => {
-
-  const ghApp = new App({
-    appId: GITHUB_APP_IDENTIFIER,
-    privateKey: GITHUB_APP_PRIVATE_KEY,
-  });
-
   try {
+    const ghApp = new App({
+      appId: GITHUB_APP_IDENTIFIER,
+      privateKey: GITHUB_APP_PRIVATE_KEY,
+    });
     const { data: installation } = await ghApp.octokit.request(
       `GET /repos/{owner}/{repo}/installation`,
       { owner, repo }
