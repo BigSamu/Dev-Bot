@@ -76,7 +76,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
     if (isSkipEntry(changesetEntriesMap)) {
       await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
       console.log("Skip option found. No changeset file created or updated.");
-      const commitMessage = `changeset file for PR #${prNumber} deleted`;
+      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
       await deleteFileByPath(
         headOctokit,
         headOwner,
@@ -105,7 +105,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
     }
     const changesetFileContent = getChangesetFileContent(changesetEntriesMap);
     const changesetFileSha = changesetFile ? changesetFile.sha : undefined;
-    const commitMessage = `changeset file for PR #${prNumber} ${
+    const commitMessage = `Changeset file for PR #${prNumber} ${
       changesetFileSha ? "updated" : "created"
     }`;
     await createOrUpdateFileByPath(
