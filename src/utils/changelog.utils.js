@@ -1,5 +1,6 @@
 import { CHANGELOG_SECTION_REGEX } from "../config/constants.js";
 import { isValidChangelogSection } from "../utils/index.js";
+import { InvalidChangelogHeadingError } from "../errors/index.js";
 
 /**
  * Processes a line from a changelog section, handling comment blocks and trimming non-comment lines.
@@ -47,15 +48,19 @@ export const extractChangelogEntries = (
   prDescription,
   processChangelogLine
 ) => {
-  // Match the changelog section using the defined regex
-  // Output -> Array of length 2:
-  // changelogSection[0]: Full regex match including '## Changelog' and following content.
-  // changelogSection[1]: Captured content after '## Changelog', excluding the heading itself.
-  // Throw error if '## Changelog' header is missing or malformed
-  const changelogSection = prDescription.match(CHANGELOG_SECTION_REGEX);
-
-  // Validate the changelog section and extract changelog entries
   try {
+    // Throw error if PR description is missing
+    if(!prDescription) {
+      throw new InvalidChangelogHeadingError();
+    }
+    // Match the changelog section using the defined regex
+    // Output -> Array of length 2:
+    // changelogSection[0]: Full regex match including '## Changelog' and following content.
+    // changelogSection[1]: Captured content after '## Changelog', excluding the heading itself.
+    // Throw error if '## Changelog' header is missing or malformed
+    const changelogSection = prDescription.match(CHANGELOG_SECTION_REGEX);
+  
+    // Validate the changelog section and extract changelog entries
     if (isValidChangelogSection(changelogSection)) {
       // Initial accumulator for reduce: empty array for lines and initial state
       const initialAcc = { entries: [], state: { inComment: false } };
