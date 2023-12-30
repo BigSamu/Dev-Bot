@@ -140,6 +140,5 @@ export const createOrUpdateChangesetFile = async (payload) => {
     );
     // Clear skip label if exists
     await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
-    throw new Error("Error creating or updating changeset file.");
   }
 };
