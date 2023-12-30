@@ -3,13 +3,13 @@
   "private": true,
   "version": "0.0.1",
   "description": "A GitHub App that generates changeset files from OpenSearch PR descriptions",
-  "main": "server.js",
+  "main": "src/main.js",
   "type": "module",
   "engines": {
     "node": ">=18.x"
   },
   "scripts": {
-    "server": "node server.js",
+    "server": "node src/main.js",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg"
   },
   "jest": {
