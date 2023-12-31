@@ -122,12 +122,13 @@ export const createOrUpdateFileByPath = async (
       content: Buffer.from(content).toString("base64"),
       sha: sha,
     });
-    console.log(
-      `File '${path}' ${path ? "updated" : "created"} successfully.`
-    );
+    // Log the message determined by the calling function
+    console.log(message);
   } catch (error) {
+    // Determine the operation based on the presence of a SHA
+    const operation = sha ? "updating" : "creating";
     console.error(
-      `Error ${path ? "updating" : "creating"} file: `,
+      `Error ${operation} file '${path}': `, 
       error.message
     );
     throw error;
