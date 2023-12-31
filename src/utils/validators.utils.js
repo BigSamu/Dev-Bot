@@ -26,15 +26,15 @@ import {
  * - In case of errors (invalid prefix, empty description, entry too long, format mismatch), the function
  *   throws custom exceptions.
  *
- * @param {string[]} changelogEntries - An array of changelog entry strings to be validated and formatted.
- * @param {string} prNumber - The number of the PR associated with these changelog entries.
- * @param {string} prLink - The URL link to the PR on GitHub.
+ * @param {string} changelogEntry - A changelog entry string to be validated and formatted.
+ * @param {number} totalEntries - The total number of entries in the changelog section.
  * @returns {Object} - An object mapping each valid prefix to its formatted changelog entry.
  *                     If the prefix is "skip", the object will map an empty string to "skip".
- * @throws {InvalidPrefixError} When the prefix is not included in the predefined list of valid prefixes.
- * @throws {EmptyEntryDescriptionError} When the changelog entry description is empty.
- * @throws {EntryTooLongError} When the changelog entry exceeds the maximum allowed length.
- * @throws {ChangelogEntryMissingHyphenError} When the changelog entry does not match the expected format.
+ * @throws {ChangelogEntryMissingHyphenError} - When the changelog entry does not match the expected format.
+ * @throws {InvalidPrefixError} - When the prefix is not included in the predefined list of valid prefixes.
+ * @throws {CategoryWithSkipOptionError} - When the changelog entry contains additional category prefixes along with the "skip" option.
+ * @throws {EmptyEntryDescriptionError} - When the changelog entry description is empty.
+ * @throws {EntryTooLongError} - When the changelog entry exceeds the maximum allowed length.
  */
 export const isValidChangelogEntry = (changelogEntry, totalEntries) => {
   const [, marker, prefix, log] = changelogEntry.match(
@@ -58,7 +58,6 @@ export const isValidChangelogEntry = (changelogEntry, totalEntries) => {
 /**
  * Handles a changeset entry map that contains the "skip" option.
  *
- * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
  * @param {Object} entryMap - Map of changeset entries.
  * @returns {Boolean} - True if the "skip" option is present in the entry map, false otherwise.
  */
