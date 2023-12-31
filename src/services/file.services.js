@@ -167,7 +167,7 @@ export const deleteFileByPath = async (
     });
     console.log(`File '${path}' deleted successfully.`);
   } catch (error) {
-    if(error.status === 404) {
+    if(error.status === 404 || error.status === 422) {
       console.log(`File '${path}' not found. No need to delete file.`);
       return;
     }
