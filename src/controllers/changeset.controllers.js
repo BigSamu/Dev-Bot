@@ -132,7 +132,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
     );
   } catch (error) {
     const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
-    // Delete changeset file if one was previously created
+    // Get changeset file if one exists
     const changesetFile = await getFileByPath(
       headOctokit,
       headOwner,
@@ -140,20 +140,17 @@ export const createOrUpdateChangesetFile = async (payload) => {
       headBranch,
       changesetFilePath
     );
-    if(changesetFile) {
-      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-      await deleteFileByPath(
-        headOctokit,
-        headOwner,
-        headRepo,
-        headBranch,
-        changesetFilePath,
-        commitMessage,
-        changesetFile?.sha
-      );
-    } else {
-      console.log("No changeset file to delete.");
-    }
+    // Delete changeset file if one was previously created
+    const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+    await deleteFileByPath(
+      headOctokit,
+      headOwner,
+      headRepo,
+      headBranch,
+      changesetFilePath,
+      commitMessage,
+      changesetFile?.sha
+    );
     const errorComment = formatPostComment({ input: error, type: "ERROR" });
     // Add error comment to PR
     await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
