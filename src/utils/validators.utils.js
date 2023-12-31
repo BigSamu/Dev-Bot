@@ -5,24 +5,12 @@ import {
 } from "../config/constants.js";
 
 import {
-  InvalidChangelogHeadingError,
-  EmptyChangelogSectionError,
   ChangelogEntryMissingHyphenError,
   InvalidPrefixError,
   EmptyEntryDescriptionError,
   EntryTooLongError,
   CategoryWithSkipOptionError,
 } from "../errors/index.js";
-
-export const isValidChangelogSection = (changelogSection) => {
-  if (!changelogSection) {
-    throw new InvalidChangelogHeadingError();
-  }
-  if (changelogSection[0].trim().length === 0) {
-    throw new EmptyChangelogSectionError();
-  }
-  return true;
-};
 
 /**
  * Validates and formats a set of changelog entries associated with a pull request (PR).
