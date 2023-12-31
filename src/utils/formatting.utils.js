@@ -3,9 +3,8 @@
  * It transforms the PascalCase 'name' of the error to spaced string, makes it bold,
  * prefixes it with a cross mark emoji, and places the 'message' in a paragraph.
  *
- * @param {Object} inputError - The error object to format.
- * @param {string} inputError.name - The PascalCase name of the error.
- * @param {string} inputError.message - The descriptive message of the error.
+ * @param {Object} input - The input object to format.
+ * @param {string} type - The type of the input object.
  * @returns {string} Formatted error message as an HTML string.
  *
 
