@@ -21,7 +21,7 @@ import { capitalize } from "./formatting.utils.js";
  * @param {string} prLink - The URL link to the PR on GitHub.
  * @returns {Object} - An object mapping each valid prefix to its formatted changelog entry.
  *                     If the prefix is "skip", the object will map an empty string to "skip".
- * @throws {Error} An error related to changelog entry validation.
+ * @throws {Error} - An error related to changelog entry validation.
  */
 export const getChangesetEntriesMap = (changelogEntries, prNumber, prLink) => {
   const changesetEntryMap = {};
