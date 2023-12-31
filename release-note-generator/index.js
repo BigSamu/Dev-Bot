@@ -53,7 +53,7 @@ async function deleteFragments() {
 async function readFragments() {
   // Initialize sections
   const sections: Changelog = (Object.fromEntries(
-    Object.keys(SECTION_MAPPING).map((key) => [key, []])
+    Object.keys(RELEASE_NOTES_SECTION_TITLES_MAPPING).map((key) => [key, []])
   ) as unknown) as Changelog;
 
   const fragmentPaths = await readdir(fragmentDirPath, { withFileTypes: true });
@@ -94,7 +94,7 @@ async function moveFragments(fragmentPaths: Dirent[]): Promise<void> {
 function generateChangelog(sections: Changelog) {
   // Generate changelog sections
   const changelogSections = Object.entries(sections).map(([sectionKey, entries]) => {
-    const sectionName = SECTION_MAPPING[sectionKey as SectionKey];
+    const sectionName = RELEASE_NOTES_SECTION_TITLES_MAPPING[sectionKey as SectionKey];
     return entries.length === 0
       ? `### ${sectionName}`
       : `### ${sectionName}\n\n${entries.map((entry) => ` - ${entry}`).join('\n')}`;
