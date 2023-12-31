@@ -1,4 +1,12 @@
 
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+export const PORT = process.env.PORT || 3000;
+export const API_PATH_SUFFIX = "/api/v1";
+
 /**
  * ****************************************************
  * I) CHANGELOG ENTRY PREFIXES
@@ -30,7 +38,7 @@ export const CHANGELOG_ENTRY_PREFIXES = [
  */
 
 /**
- * Define regex pattern for the changelog heading.
+ * Regex pattern to match the changelog heading.
  * @type {string}
  */
 export const CHANGELOG_HEADING = "## Changelog";
@@ -43,7 +51,7 @@ export const CHANGELOG_SECTION_REGEX = new RegExp(
   `${CHANGELOG_HEADING}\\s*([\\s\\S]*?)(?:\\n##|$)`
 );
 // Explanation:
-// - 'CHANGELOG_HEADING' Matches the '## Changelog' heading in markdown.
+// - 'CHANGELOG_HEADING' matches the '## Changelog' heading in markdown.
 // - '\s*' matches any whitespace character following '## Changelog'.
 // - '([\s\S]*?)' is a non-greedy capturing group that matches all characters, either whitespace or non-whitespace, up until the next section heading.
 // - '(?:\n##|$)' is a non-capturing group that matches either a section heading or the end of the string.
@@ -53,7 +61,7 @@ export const CHANGELOG_SECTION_REGEX = new RegExp(
  * @type {RegExp}
  */
 export const ENTRY_FORMATTING_PATTERN_REGEX = new RegExp(
-  `-\\s*([a-zA-Z0-9]+):?(.*)?`
+  `([^a-zA-Z])?\\s*([a-zA-Z0-9]+):?(.*)?`
 );
 // Explanation:
 // - '-\\s*' matches a hyphen followed by any number of whitespace characters up until the first capturing group.
@@ -77,15 +85,25 @@ export const ENTRY_FORMATTING_PATTERN_REGEX = new RegExp(
 export const MAX_ENTRY_LENGTH = 100;
 
 /**
- * GitHub authentication token used for accessing the GitHub API.
- * It is expected to be set as an environment variable.
+ * The GitHub App ID.
  * @type {string}
  */
-export const GITHUB_TOKEN = process.env.INPUT_TOKEN;
+export const GITHUB_APP_IDENTIFIER = process.env.GITHUB_APP_IDENTIFIER;
 
 /**
- * The file path where the changeset will be stored or updated.
- * This path is read from an environment variable.
+ * The GitHub App webhook secret.
+ * @type {string}
+ */
+export const GITHUB_APP_WEBHOOK_SECRET = process.env.GITHUB_APP_WEBHOOK_SECRET;
+
+/**
+ * The GitHub App private key.
+ * @type {string}
+ */
+export const GITHUB_APP_PRIVATE_KEY = process.env.GITHUB_APP_PRIVATE_KEY;
+
+/**
+ * The file path where the changeset files will be stored or updated.
  * @type {string}
  */
 export const CHANGESET_PATH = "changelogs/fragments";
@@ -97,7 +115,7 @@ export const CHANGESET_PATH = "changelogs/fragments";
 export const SKIP_LABEL = "Skip-Changelog";
 
 /**
-* The label that will be added to the PR if the "skip" option is used.
+* The label that will be added to the PR if the process fails.
 * @type {string}
 */
 export const FAILED_CHANGESET_LABEL = "failed changeset";

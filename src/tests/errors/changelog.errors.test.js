@@ -1,9 +1,6 @@
+import { MAX_ENTRY_LENGTH } from "../../config/constants.js";
+
 import {
-  PullRequestDataExtractionError,
-  GetGithubContentError,
-  CreateChangesetFileError,
-  UpdateChangesetFileError,
-  UpdatePRLabelError,
   InvalidChangelogHeadingError,
   EntryTooLongError,
   InvalidPrefixError,
@@ -11,48 +8,9 @@ import {
   ChangelogEntryMissingHyphenError,
   EmptyEntryDescriptionError,
   EmptyChangelogSectionError,
-} from "../utils/customErrors.js";
+} from "../../errors/index.js";
 
-import { MAX_ENTRY_LENGTH } from "../config/constants.js";
-
-describe("Custom Errors Tests", () => {
-  test("PullRequestDataExtractionError default message", () => {
-    const error = new PullRequestDataExtractionError();
-    expect(error.message).toBe("Error extracting data from Pull Request");
-    expect(error.name).toBe("PullRequestDataExtractionError");
-    expect(error.shouldResultInPRComment).toBe(false);
-  });
-
-  test("GetGithubContentError default message", () => {
-    const error = new GetGithubContentError();
-    expect(error.message).toBe("Error retrieving content from GitHub repository");
-    expect(error.name).toBe("GetGithubContentError");
-    expect(error.shouldResultInPRComment).toBe(false);
-  });
-
-  test("CreateChangesetFileError default message", () => {
-    const error = new CreateChangesetFileError();
-    expect(error.message).toBe("Error creating changeset file");
-    expect(error.name).toBe("CreateChangesetFileError");
-    expect(error.shouldResultInPRComment).toBe(false);
-  });
-
-  test("UpdateChangesetFileError default message", () => {
-    const error = new UpdateChangesetFileError();
-    expect(error.message).toBe("Error updating changeset file");
-    expect(error.name).toBe("UpdateChangesetFileError");
-    expect(error.shouldResultInPRComment).toBe(false);
-  });
-
-  test("UpdatePRLabelError default message", () => {
-    const error = new UpdatePRLabelError();
-    expect(error.message).toBe(
-      "There was an error updating the label of the pull request. Please ensure the PR is accessible and the label format is correct."
-    );
-    expect(error.name).toBe("UpdatePRLabelError");
-    expect(error.shouldResultInPRComment).toBe(false);
-  });
-
+describe("Changelog Errors Tests", () => {
   test("InvalidChangelogHeadingError default message", () => {
     const error = new InvalidChangelogHeadingError();
     expect(error.message).toBe(
