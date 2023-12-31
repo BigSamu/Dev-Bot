@@ -85,8 +85,22 @@ export const ENTRY_FORMATTING_PATTERN_REGEX = new RegExp(
  */
 export const MAX_ENTRY_LENGTH = 100;
 
+/**
+ * The GitHub App ID.
+ * @type {string}
+ */
 export const GITHUB_APP_IDENTIFIER = process.env.GITHUB_APP_IDENTIFIER;
+
+/**
+ * The GitHub App webhook secret.
+ * @type {string}
+ */
 export const GITHUB_APP_WEBHOOK_SECRET = process.env.GITHUB_APP_WEBHOOK_SECRET;
+
+/**
+ * The GitHub App private key.
+ * @type {string}
+ */
 export const GITHUB_APP_PRIVATE_KEY = process.env.GITHUB_APP_PRIVATE_KEY;
 
 /**
