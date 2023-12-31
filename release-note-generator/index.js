@@ -5,10 +5,8 @@ import { mkdir, readdir } from 'fs/promises';
 import { version as pkgVersion } from '../../package.json';
 import {
   validateFragment,
-  Changelog,
   fragmentDirPath,
   fragmentTempDirPath,
-  SectionKey,
   releaseNotesDirPath,
   filePath,
 } from './generate_release_note_helper';
@@ -17,7 +15,7 @@ import { RELEASE_NOTES_SECTION_TITLES_MAPPING } from '../src/config/constants';
 import { getCurrentDateFormatted } from '../src/utils/formatting.utils.js';
 
 // Function to add content after the 'Unreleased' section in the changelog
-function addContentAfterUnreleased(path: string, newContent: string): void {
+function addContentAfterUnreleased(path, newContent) {
   let fileContent = readFileSync(path, 'utf8');
   const targetString = '## [Unreleased]';
   const targetIndex = fileContent.indexOf(targetString);
@@ -42,7 +40,7 @@ function addContentAfterUnreleased(path: string, newContent: string): void {
 }
 
 async function deleteFragments() {
-  rm(fragmentTempDirPath, { recursive: true }, (err: any) => {
+  rm(fragmentTempDirPath, { recursive: true }, (err) => {
     if (err) {
       throw err;
     }
@@ -52,9 +50,9 @@ async function deleteFragments() {
 // Read fragment files and populate sections
 async function readFragments() {
   // Initialize sections
-  const sections: Changelog = (Object.fromEntries(
+  const sections = (Object.fromEntries(
     Object.keys(RELEASE_NOTES_SECTION_TITLES_MAPPING).map((key) => [key, []])
-  ) as unknown) as Changelog;
+  ));
 
   const fragmentPaths = await readdir(fragmentDirPath, { withFileTypes: true });
   for (const fragmentFilename of fragmentPaths) {
@@ -70,16 +68,16 @@ async function readFragments() {
 
     validateFragment(fragmentContents);
 
-    const fragmentYaml = loadYaml(fragmentContents) as Changelog;
+    const fragmentYaml = loadYaml(fragmentContents);
 
     for (const [sectionKey, entries] of Object.entries(fragmentYaml)) {
-      sections[sectionKey as SectionKey].push(...entries);
+      sections[sectionKey].push(...entries);
     }
   }
   return { sections, fragmentPaths };
 }
 
-async function moveFragments(fragmentPaths: Dirent[]): Promise<void> {
+async function moveFragments(fragmentPaths) {
   // create folder for temp fragments at fragmentTempDirPath
   await mkdir(fragmentTempDirPath, { recursive: true });
 
@@ -91,10 +89,10 @@ async function moveFragments(fragmentPaths: Dirent[]): Promise<void> {
   }
 }
 
-function generateChangelog(sections: Changelog) {
+function generateChangelog(sections) {
   // Generate changelog sections
   const changelogSections = Object.entries(sections).map(([sectionKey, entries]) => {
-    const sectionName = RELEASE_NOTES_SECTION_TITLES_MAPPING[sectionKey as SectionKey];
+    const sectionName = RELEASE_NOTES_SECTION_TITLES_MAPPING[sectionKey];
     return entries.length === 0
       ? `### ${sectionName}`
       : `### ${sectionName}\n\n${entries.map((entry) => ` - ${entry}`).join('\n')}`;
@@ -110,7 +108,7 @@ function generateChangelog(sections: Changelog) {
   return changelogSections;
 }
 
-function generateReleaseNote(changelogSections: string[]) {
+function generateReleaseNote(changelogSections) {
   // Generate release note
   const releaseNoteFilename = `opensearch-dashboards.release-notes-${pkgVersion}.md`;
   const releaseNoteHeader = `# VERSION ${pkgVersion} Release Note`;
