@@ -3,7 +3,6 @@
 // ---------------------------------------------------
 
 import express from "express";
-import fs from "fs";
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 
 import releaseNotesRouter from "./routes/releaseNotes.routes.js";
