@@ -26,7 +26,6 @@ export const getOcktokitClient = async (owner, repo) => {
     );
     return ghApp.getInstallationOctokit(installation.id);
   } catch (error) {
-    // Handle the error here, you can log it or perform any other necessary actions.
     console.error('Error in getOcktokitClient:', error);
     throw error; // Re-throw the error to propagate it to the caller.
   }
