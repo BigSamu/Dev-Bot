@@ -1,5 +1,5 @@
 /**
- * Get a label from an issue or pull request in a GitHub repository.
+ * Gets a label from an issue or pull request in a GitHub repository.
  *
  * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
  * @param {string} owner - Owner of the repository.
@@ -36,7 +36,7 @@ export const getOneLabel = async (
 };
 
 /**
- * Get information about a label in a GitHub repository.
+ * Gets information about a label in a GitHub repository.
  *
  * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
  * @param {string} owner - Owner of the repository.
