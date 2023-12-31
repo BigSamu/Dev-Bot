@@ -27,6 +27,7 @@ import {
 export const createOrUpdateChangesetFile = async (payload) => {
   let baseOwner,
     baseRepo,
+    baseBranch,
     headOwner,
     headRepo,
     headBranch,
