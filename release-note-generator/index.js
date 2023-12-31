@@ -6,7 +6,6 @@ import { version as pkgVersion } from '../../package.json';
 import {
   validateFragment,
   Changelog,
-  SECTION_MAPPING,
   fragmentDirPath,
   fragmentTempDirPath,
   SectionKey,
@@ -14,6 +13,7 @@ import {
   filePath,
 } from './generate_release_note_helper';
 
+import { RELEASE_NOTES_SECTION_TITLES_MAPPING } from '../src/config/constants';
 import { getCurrentDateFormatted } from '../src/utils/formatting.utils.js';
 
 // Function to add content after the 'Unreleased' section in the changelog
