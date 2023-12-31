@@ -36,32 +36,6 @@ export const getOneLabel = async (
 };
 
 /**
- * Gets information about a label in a GitHub repository.
- *
- * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
- * @param {string} owner - Owner of the repository.
- * @param {string} repo - Repository name.
- * @param {string} labelName - Name of the label.
- * @returns {Promise<object>} A Promise that resolves with label information.
- * @throws {Error} - If an error occurs while fetching label information.
- */
-export async function getLabel(octokit, owner, repo, labelName) {
-  try {
-    // Get information about the label
-    const { data: label } = await octokit.issues.getLabel({
-      owner,
-      repo,
-      name: labelName,
-    });
-
-    return label;
-  } catch (error) {
-    console.error("Error fetching label:", error);
-    throw error;
-  }
-}
-
-/**
  * Add a label to an issue or pull request in a GitHub repository.
  *
  * @param {InstanceType<typeof GitHub>} octokit - An Octokit instance initialized with a GitHub token.
