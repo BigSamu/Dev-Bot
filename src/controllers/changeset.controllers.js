@@ -77,17 +77,21 @@ export const createOrUpdateChangesetFile = async (payload) => {
     if (isSkipEntry(changesetEntriesMap)) {
       await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
       console.log("Skip option found. No changeset file created or updated.");
-      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-      // Delete changeset file if one was previously created
-      await deleteFileByPath(
-        headOctokit,
-        headOwner,
-        headRepo,
-        headBranch,
-        changesetFilePath,
-        commitMessage,
-        changesetFile?.sha
-      );
+      if(changesetFile) {
+        // Delete changeset file if one was previously created
+        const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+        await deleteFileByPath(
+          headOctokit,
+          headOwner,
+          headRepo,
+          headBranch,
+          changesetFilePath,
+          commitMessage,
+          changesetFile.sha
+        );
+      } else {
+        console.log('No changeset file to delete.');
+      }
       // Clear 'failed changeset' label if exists
       await removeLabel(
         baseOctokit,
@@ -140,17 +144,21 @@ export const createOrUpdateChangesetFile = async (payload) => {
       headBranch,
       changesetFilePath
     );
-    // Delete changeset file if one was previously created
-    const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-    await deleteFileByPath(
-      headOctokit,
-      headOwner,
-      headRepo,
-      headBranch,
-      changesetFilePath,
-      commitMessage,
-      changesetFile?.sha
-    );
+    if(changesetFile) {
+      // Delete changeset file if one was previously created
+      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+      await deleteFileByPath(
+        headOctokit,
+        headOwner,
+        headRepo,
+        headBranch,
+        changesetFilePath,
+        commitMessage,
+        changesetFile.sha
+      );
+    } else {
+      console.log('No changeset file to delete.');
+    }
     const errorComment = formatPostComment({ input: error, type: "ERROR" });
     // Add error comment to PR
     await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
