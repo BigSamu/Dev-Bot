@@ -27,18 +27,6 @@ export const releaseNotesDirPath = resolve(
   "release-notes"
 );
 
-export function getCurrentDateFormatted() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-  const day = now.getDate();
-
-  const formattedMonth = month.toString().padStart(2, "0");
-  const formattedDay = day.toString().padStart(2, "0");
-
-  return `${year}-${formattedMonth}-${formattedDay}`;
-}
-
 // validate format of fragment files
 export function validateFragment(content) {
   const sections = content.split("\n\n");

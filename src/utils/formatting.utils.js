@@ -32,3 +32,20 @@ export const capitalize = (str) => {
   }
   return str;
 };
+
+/**
+ * Gets the current date and returns it in a formatted string.
+ *
+ * @returns {string} The current date in 'YYYY-MM-DD' format.
+ */
+export function getCurrentDateFormatted() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // Months are zero-indexed
+  const day = now.getDate();
+
+  const formattedMonth = month.toString().padStart(2, "0");
+  const formattedDay = day.toString().padStart(2, "0");
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
+}

@@ -5,7 +5,6 @@ import { mkdir, readdir } from 'fs/promises';
 import { version as pkgVersion } from '../../package.json';
 import {
   validateFragment,
-  getCurrentDateFormatted,
   Changelog,
   SECTION_MAPPING,
   fragmentDirPath,
@@ -14,6 +13,8 @@ import {
   releaseNotesDirPath,
   filePath,
 } from './generate_release_note_helper';
+
+import { getCurrentDateFormatted } from '../src/utils/formatting.utils.js';
 
 // Function to add content after the 'Unreleased' section in the changelog
 function addContentAfterUnreleased(path: string, newContent: string): void {
