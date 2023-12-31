@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
-export const ENVIRONMENT = process.env.NODE_ENV;
 export const PORT = process.env.PORT || 3000;
 export const API_PATH_SUFFIX = "/api/v1";
 
