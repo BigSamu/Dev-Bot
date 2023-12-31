@@ -1,6 +1,5 @@
 import { CHANGELOG_SECTION_REGEX } from "../config/constants.js";
-import { isValidChangelogSection } from "../utils/index.js";
-import { InvalidChangelogHeadingError } from "../errors/index.js";
+import { EmptyChangelogSectionError, InvalidChangelogHeadingError } from "../errors/index.js";
 
 /**
  * Processes a line from a changelog section, handling comment blocks and trimming non-comment lines.
@@ -54,37 +53,41 @@ export const extractChangelogEntries = (
       throw new InvalidChangelogHeadingError();
     }
     // Match the changelog section using the defined regex
+    const changelogSection = prDescription.match(CHANGELOG_SECTION_REGEX);
     // Output -> Array of length 2:
     // changelogSection[0]: Full regex match including '## Changelog' and following content.
     // changelogSection[1]: Captured content after '## Changelog', excluding the heading itself.
     // Throw error if '## Changelog' header is missing or malformed
-    const changelogSection = prDescription.match(CHANGELOG_SECTION_REGEX);
-  
-    // Validate the changelog section and extract changelog entries
-    if (isValidChangelogSection(changelogSection)) {
-      // Initial accumulator for reduce: empty array for lines and initial state
-      const initialAcc = { entries: [], state: { inComment: false } };
-
-      // Process each line and filter out valid changelog entries
-      const changelogEntries = changelogSection[0]
-        .split("\n")
-        .reduce((acc, line) => {
-          const { entries, state } = acc;
-          const processed = processChangelogLine(line, state);
-          if (processed.line) entries.push(processed.line.trim());
-          return { entries, state: processed.state };
-        }, initialAcc).entries;
-
-      console.log(
-        `Found ${changelogEntries.length} changelog ${
-          changelogEntries.length === 1 ? "entry" : "entries"
-        }:`
-      );
-      for (const eachEntry of changelogEntries){
-         console.log(`${eachEntry}`);
-      }
-      return changelogEntries;
+    if(!changelogSection) {
+      throw new InvalidChangelogHeadingError();
     }
+
+    // Declare initial accumulator for reduce function: empty array for lines and initial state
+    const initialAcc = { entries: [], state: { inComment: false } };
+
+    // Process each line and filter out valid changelog entries
+    const changelogEntries = changelogSection[0]
+      .split("\n")
+      .reduce((acc, line) => {
+        const { entries, state } = acc;
+        const processed = processChangelogLine(line, state);
+        if (processed.line) entries.push(processed.line.trim());
+        return { entries, state: processed.state };
+      }, initialAcc).entries;
+    
+    if(changelogEntries.length === 0) {
+      throw new EmptyChangelogSectionError();
+    }
+
+    console.log(
+      `Found ${changelogEntries.length} changelog ${
+        changelogEntries.length === 1 ? "entry" : "entries"
+      }:`
+    );
+    for (const eachEntry of changelogEntries){
+        console.log(`${eachEntry}`);
+    }
+    return changelogEntries;
   } catch (error) {
     console.error("Error: " + error.message);
     throw error;
