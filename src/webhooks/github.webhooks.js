@@ -1,6 +1,6 @@
 import { createOrUpdateChangesetFile } from "../controllers/changeset.controllers.js";
 
-export const setupWebhooks = (webhooks,webhookUrl) => {
+export const setupWebhooks = (webhooks) => {
 
   webhooks.on("pull_request.opened", async ({ payload }) => {
     console.log(
