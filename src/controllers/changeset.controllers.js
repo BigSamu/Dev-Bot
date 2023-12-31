@@ -118,7 +118,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
       commitMessage,
       changesetFileSha
     );
-
+    
     // Step 4 - Clean labels if exist
     await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
     await removeLabel(
@@ -129,6 +129,28 @@ export const createOrUpdateChangesetFile = async (payload) => {
       FAILED_CHANGESET_LABEL
     );
   } catch (error) {
+    const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
+    const changesetFile = await getFileByPath(
+      headOctokit,
+      headOwner,
+      headRepo,
+      headBranch,
+      changesetFilePath
+    );
+    if(changesetFile) {
+      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+      await deleteFileByPath(
+        headOctokit,
+        headOwner,
+        headRepo,
+        headBranch,
+        changesetFilePath,
+        commitMessage,
+        changesetFile?.sha
+      );
+    } else {
+      console.log("No changeset file to delete.");
+    }
     const errorComment = formatPostComment({ input: error, type: "ERROR" });
     await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
     await addLabel(
