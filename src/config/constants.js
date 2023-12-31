@@ -31,6 +31,19 @@ export const CHANGELOG_ENTRY_PREFIXES = [
   "skip",
 ];
 
+export const RELEASE_NOTES_SECTION_TITLES_MAPPING = {
+  breaking: '💥 Breaking Changes',
+  deprecate: 'Deprecations',
+  security: '🛡 Security',
+  feat: '📈 Features/Enhancements',
+  fix: '🐛 Bug Fixes',
+  infra: '🚞 Infrastructure',
+  doc: '📝 Documentation',
+  chore: '🛠 Maintenance',
+  refactor: '🪛 Refactoring',
+  test: '🔩 Tests',
+};
+
 /**
  * ****************************************************
  * II) REGEX PATTERNS
