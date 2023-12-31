@@ -5,7 +5,7 @@ export const fragmentDirPath = resolve(__dirname, '..', '..', 'changelogs', 'fra
 export const fragmentTempDirPath = resolve(__dirname, '..', '..', 'changelogs', 'temp_fragments');
 export const releaseNotesDirPath = resolve(__dirname, '..', '..', 'release-notes');
 
-export function getCurrentDateFormatted(): string {
+export function getCurrentDateFormatted() {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
@@ -30,13 +30,11 @@ export const SECTION_MAPPING = {
   test: '🔩 Tests',
 };
 
-export type SectionKey = keyof typeof SECTION_MAPPING;
-export type Changelog = Record<SectionKey, string[]>;
 
 const MAX_ENTRY_LENGTH = 100;
 
 // validate format of fragment files
-export function validateFragment(content: string) {
+export function validateFragment(content) {
   const sections = content.split('\n\n');
 
   // validate each section
@@ -45,7 +43,7 @@ export function validateFragment(content: string) {
     const sectionName = lines[0];
     const sectionKey = sectionName.slice(0, -1);
 
-    if (!SECTION_MAPPING[sectionKey as SectionKey] || !sectionName.endsWith(':')) {
+    if (!SECTION_MAPPING[sectionKey] || !sectionName.endsWith(':')) {
       throw new Error(`Unknown section ${sectionKey}.`);
     }
     // validate entries. each entry must start with '-' and a space. then followed by a string. string must be non-empty and less than 50 characters
