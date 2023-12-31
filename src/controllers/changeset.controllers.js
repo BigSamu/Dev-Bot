@@ -3,6 +3,7 @@ import {
   FAILED_CHANGESET_LABEL,
   SKIP_LABEL,
 } from "../config/constants.js";
+
 import {
   getFileByPath,
   createOrUpdateFileByPath,
@@ -26,7 +27,6 @@ import {
 export const createOrUpdateChangesetFile = async (payload) => {
   let baseOwner,
     baseRepo,
-    baseBranch,
     headOwner,
     headRepo,
     headBranch,
@@ -77,6 +77,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
       await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
       console.log("Skip option found. No changeset file created or updated.");
       const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+      // Delete changeset file if one was previously created
       await deleteFileByPath(
         headOctokit,
         headOwner,
@@ -118,8 +119,8 @@ export const createOrUpdateChangesetFile = async (payload) => {
       commitMessage,
       changesetFileSha
     );
-    
-    // Step 4 - Clean labels if exist
+
+    // Step 4 - Remove "Skip-Changelog" and "failed changeset" labels if they exist
     await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
     await removeLabel(
       baseOctokit,
@@ -130,6 +131,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
     );
   } catch (error) {
     const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
+    // Delete changeset file if one was previously created
     const changesetFile = await getFileByPath(
       headOctokit,
       headOwner,
@@ -152,7 +154,9 @@ export const createOrUpdateChangesetFile = async (payload) => {
       console.log("No changeset file to delete.");
     }
     const errorComment = formatPostComment({ input: error, type: "ERROR" });
+    // Add error comment to PR
     await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
+    // Add failed changeset label
     await addLabel(
       baseOctokit,
       baseOwner,
