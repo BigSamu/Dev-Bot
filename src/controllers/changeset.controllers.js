@@ -66,32 +66,21 @@ export const createOrUpdateChangesetFile = async (payload) => {
     );
 
     // Step 2 - Handle "skip" option
-    const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
-    const changesetFile = await getFileByPath(
-      headOctokit,
-      headOwner,
-      headRepo,
-      headBranch,
-      changesetFilePath
-    );
+
     if (isSkipEntry(changesetEntriesMap)) {
       await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
-      console.log("Skip option found. No changeset file created or updated.");
-      if(changesetFile) {
-        // Delete changeset file if one was previously created
-        const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-        await deleteFileByPath(
-          headOctokit,
-          headOwner,
-          headRepo,
-          headBranch,
-          changesetFilePath,
-          commitMessage,
-          changesetFile.sha
-        );
-      } else {
-        console.log('No changeset file to delete.');
-      }
+
+      // Delete changeset file if one was previously created
+      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+      await deleteFileByPath(
+        headOctokit,
+        headOwner,
+        headRepo,
+        headBranch,
+        `${CHANGESET_PATH}/${prNumber}.yml`,
+        commitMessage
+      );
+
       // Clear 'failed changeset' label if exists
       await removeLabel(
         baseOctokit,
@@ -104,25 +93,20 @@ export const createOrUpdateChangesetFile = async (payload) => {
     }
 
     // Step 3 - Add or update the changeset file in head repo
-    if (!changesetFile) {
-      console.log(
-        "No changeset file found. Proceding to create new changeset file..."
-      );
-    }
+
     const changesetFileContent = getChangesetFileContent(changesetEntriesMap);
-    const changesetFileSha = changesetFile ? changesetFile.sha : undefined;
-    const commitMessage = `Changeset file for PR #${prNumber} ${
-      changesetFileSha ? "updated" : "created"
-    }`;
+    const commitMessage = (changesetFileSha) =>
+      `Changeset file for PR #${prNumber} ${
+        changesetFileSha ? "updated" : "created"
+      }`;
     await createOrUpdateFileByPath(
       headOctokit,
       headOwner,
       headRepo,
       headBranch,
-      changesetFilePath,
+      `${CHANGESET_PATH}/${prNumber}.yml`,
       changesetFileContent,
-      commitMessage,
-      changesetFileSha
+      commitMessage
     );
 
     // Step 4 - Remove "Skip-Changelog" and "failed changeset" labels if they exist
@@ -136,29 +120,18 @@ export const createOrUpdateChangesetFile = async (payload) => {
     );
   } catch (error) {
     const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
-    // Get changeset file if one exists
-    const changesetFile = await getFileByPath(
+
+    // Delete changeset file if one was previously created
+    const commitMessage = `Changeset file for PR #${prNumber} deleted`;
+    await deleteFileByPath(
       headOctokit,
       headOwner,
       headRepo,
       headBranch,
-      changesetFilePath
+      changesetFilePath,
+      commitMessage
     );
-    if(changesetFile) {
-      // Delete changeset file if one was previously created
-      const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-      await deleteFileByPath(
-        headOctokit,
-        headOwner,
-        headRepo,
-        headBranch,
-        changesetFilePath,
-        commitMessage,
-        changesetFile.sha
-      );
-    } else {
-      console.log('No changeset file to delete.');
-    }
+
     const errorComment = formatPostComment({ input: error, type: "ERROR" });
     // Add error comment to PR
     await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);

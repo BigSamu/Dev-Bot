@@ -63,6 +63,9 @@ export const isValidChangelogEntry = (changelogEntry, totalEntries) => {
  */
 export const isSkipEntry = (entryMap) => {
   if (entryMap && Object.keys(entryMap).includes("skip")) {
+    console.log(
+      "Skip option found. No changeset file to create or update and delete any existing one."
+    );
     return true;
   } else {
     return false;

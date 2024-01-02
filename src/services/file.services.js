@@ -21,7 +21,6 @@ export const getFileByPath = async (octokit, owner, repo, branch, path) => {
     if (Array.isArray(data)) {
       throw new Error("The provided path is a directory, not a file.");
     }
-
     return {
       name: data.name,
       path: data.path,
@@ -109,28 +108,32 @@ export const createOrUpdateFileByPath = async (
   branch,
   path,
   content,
-  message,
-  sha
+  message
 ) => {
   try {
+    const changesetFile = await getFileByPath(
+      octokit,
+      owner,
+      repo,
+      branch,
+      path
+    );
+    const sha = changesetFile ? changesetFile.sha : null;
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: owner,
       repo: repo,
       branch: branch,
       path: path,
-      message: message,
+      message: message(sha),
       content: Buffer.from(content).toString("base64"),
       sha: sha,
     });
     // Log the message determined by the calling function
-    console.log(message);
+    console.log(message(sha));
   } catch (error) {
     // Determine the operation based on the presence of a SHA
     const operation = sha ? "updating" : "creating";
-    console.error(
-      `Error ${operation} file '${path}': `, 
-      error.message
-    );
+    console.error(`Error ${operation} file '${path}': `, error.message);
     throw error;
   }
 };
@@ -154,24 +157,30 @@ export const deleteFileByPath = async (
   repo,
   branch,
   path,
-  message,
-  sha
+  message
 ) => {
   try {
-    await octokit.rest.repos.deleteFile({
-      owner: owner,
-      repo: repo,
-      path: path,
-      message: message,
-      sha: sha,
-      branch: branch,
-    });
-    console.log(`File '${path}' deleted successfully.`);
-  } catch (error) {
-    if(error.status === 404 || error.status === 422) {
-      console.log(`File '${path}' not found. No need to delete file.`);
-      return;
+    const changesetFile = await getFileByPath(
+      octokit,
+      owner,
+      repo,
+      branch,
+      path
+    );
+    if (changesetFile) {
+      await octokit.rest.repos.deleteFile({
+        owner: owner,
+        repo: repo,
+        path: path,
+        message: message,
+        sha: changesetFile.sha,
+        branch: branch,
+      });
+      console.log(message);
+    } else {
+      console.log(`No file to delete.`);
     }
+  } catch (error) {
     console.error("Error deleting file:", error);
     throw error;
   }
