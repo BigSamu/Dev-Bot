@@ -1,7 +1,5 @@
 import { MAX_ENTRY_LENGTH } from "../config/constants.js";
 
-
-
 /**
  * Represents an error for a missing or malformed changelog heading in a PR description.
  */
