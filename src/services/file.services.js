@@ -132,7 +132,7 @@ export const createOrUpdateFileByPath = async (
   } catch (error) {
     // Determine the operation based on the presence of a SHA
     const operation = sha ? "updating" : "creating";
-    console.error(`Error ${operation} file '${path}': `, error.message);
+    console.error(`Error ${operation} file '${path}':`, error.message);
     throw error;
   }
 };
