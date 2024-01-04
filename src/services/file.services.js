@@ -95,7 +95,7 @@ export const getAllFilesByPath = async (
  * @param {string} repo - The repository name.
  * @param {string} branch - The branch name.
  * @param {string} path - The file path.
- * @param {string} content - The file content.
+ * @param {string} encodedContent - The file content encoded in base64.
  * @param {string} message - The commit message.
  * @returns {Promise<object>} - An object containing the created or updated file details.
  * @throws {Error} - If an error occurs while creating or updating the file.
@@ -106,7 +106,7 @@ export const createOrUpdateFileByPath = async (
   repo,
   branch,
   path,
-  content,
+  encodedContent,
   message
 ) => {
   try {
@@ -124,7 +124,7 @@ export const createOrUpdateFileByPath = async (
       branch: branch,
       path: path,
       message: message(sha),
-      content: content,
+      content: encodedContent,
       sha: sha,
     });
     // Log the message determined by the calling function
