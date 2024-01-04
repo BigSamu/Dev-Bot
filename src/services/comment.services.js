@@ -21,7 +21,7 @@ export async function postComment(octokit, owner, repo, issueOrPullRequestNumber
 
     console.log(`Comment posted successfully on Issue/PR #${issueOrPullRequestNumber}`);
   } catch (error) {
-    console.error("Error posting comment:", error);
+    console.error("Error posting comment:", error.messsage);
     throw error;
   }
 }
