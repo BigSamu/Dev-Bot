@@ -33,7 +33,7 @@ export const getFileByPath = async (octokit, owner, repo, branch, path) => {
       console.log(`File '${path}' not found.`);
       return;
     } else {
-      console.error("Error fetching file:", error.messsage);
+      console.error("Error fetching file:", error.message);
       throw error;
     }
   }
@@ -82,7 +82,7 @@ export const getAllFilesByPath = async (
         sha: file.sha,
       }));
   } catch (error) {
-    console.error("Error fetching directory contents:", error.messsage);
+    console.error("Error fetching directory contents:", error.message);
     throw error;
   }
 };
@@ -181,7 +181,7 @@ export const deleteFileByPath = async (
       console.log(`No file to delete.`);
     }
   } catch (error) {
-    console.error("Error deleting file:", error.messsage);
+    console.error("Error deleting file:", error.message);
     throw error;
   }
 };
@@ -253,7 +253,7 @@ export async function deleteAllFilesByPath(
 
     console.log(`All files in ${directoryPath} deleted successfully.`);
   } catch (error) {
-    console.error("Error deleting all files:", error.messsage);
+    console.error("Error deleting all files:", error.message);
     throw error;
   }
 }
