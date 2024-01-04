@@ -124,7 +124,7 @@ export const createOrUpdateFileByPath = async (
       branch: branch,
       path: path,
       message: message(sha),
-      content: Buffer.from(content).toString("base64"),
+      content: content,
       sha: sha,
     });
     // Log the message determined by the calling function

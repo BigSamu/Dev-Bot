@@ -94,6 +94,9 @@ export const createOrUpdateChangesetFile = async (payload) => {
     // Step 3 - Add or update the changeset file in head repo
 
     const changesetFileContent = getChangesetFileContent(changesetEntriesMap);
+    const changesetFileContentEncoded = Buffer.from(
+      changesetFileContent
+    ).toString("base64");
     const commitMessage = (changesetFileSha) =>
       `Changeset file for PR #${prNumber} ${
         changesetFileSha ? "updated" : "created"
@@ -104,7 +107,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
       headRepo,
       headBranch,
       `${CHANGESET_PATH}/${prNumber}.yml`,
-      changesetFileContent,
+      changesetFileContentEncoded,
       commitMessage
     );
 
