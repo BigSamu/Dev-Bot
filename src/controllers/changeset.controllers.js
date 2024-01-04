@@ -48,8 +48,8 @@ export const createOrUpdateChangesetFile = async (payload) => {
       prLink,
     } = extractPullRequestData(payload.pull_request));
 
-    baseOctokit = await getOcktokitClient(baseOwner, baseRepo);
-    headOctokit = await getOcktokitClient(headOwner, headRepo);
+    baseOctokit = await authServices.getOcktokitClient(baseOwner, baseRepo);
+    headOctokit = await authServices.getOcktokitClient(headOwner, headRepo);
 
     // Step 1 - Parse changelog entries and validate
     const changelogEntries = extractChangelogEntries(
@@ -116,6 +116,8 @@ export const createOrUpdateChangesetFile = async (payload) => {
       FAILED_CHANGESET_LABEL
     );
   } catch (error) {
+    
+    console.error(error);
     const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
 
     // Delete changeset file if one was previously created
