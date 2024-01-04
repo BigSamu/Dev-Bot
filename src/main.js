@@ -6,6 +6,7 @@ import express from "express";
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 
 import releaseNotesRouter from "./routes/releaseNotes.routes.js";
+import fileRouter from "./routes/file.routes.js";
 
 import {
   GITHUB_APP_WEBHOOK_SECRET,
@@ -37,6 +38,7 @@ setupWebhooks(webhooks, webhookUrl);
 
 // 6) Suscribe API routes
 app.use(API_PATH_SUFFIX, releaseNotesRouter);
+app.use(API_PATH_SUFFIX, fileRouter);
 
 // 7) Running instance of Express server in selected port
 app.listen(PORT, () => {

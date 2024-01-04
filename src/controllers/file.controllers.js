@@ -13,7 +13,7 @@ export const getFileByPath = async (req, res) => {
     );
     res.json(file);
   } catch (error) {
-    res.status(error.status).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -30,7 +30,7 @@ export const getAllFileByPath = async (req, res) => {
     );
     res.json(files);
   } catch (error) {
-    res.status(error.status).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -38,12 +38,9 @@ export const createOrUpdateFile = async (req, res) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const { content, message } = req.body;
+    console.log(owner, repo, branch, path, content, message)
     const decodedContent = Buffer.from(content, "base64").toString("utf-8");
     const octokit = await authServices.getOcktokitClient(owner, repo);
-    const commitMessage = (changesetFileSha) =>
-      `Changeset file for PR #${prNumber} ${
-        changesetFileSha ? "updated" : "created"
-      }`;
     await fileServices.createOrUpdateFileByPath(
       octokit,
       owner,
@@ -55,7 +52,7 @@ export const createOrUpdateFile = async (req, res) => {
     );
     res.status(201).json({message: "File created/updated successfully"});
   } catch (error) {
-    res.status(error.status).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -63,7 +60,6 @@ export const deleteFileByPath = async (req, res) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const { message } = req.body;
-    const commitMessage = `Changeset file for PR #${prNumber} deleted`;
     const octokit = await authServices.getOcktokitClient(owner, repo);
     await fileServices.deleteFileByPath(
       octokit,
@@ -75,7 +71,7 @@ export const deleteFileByPath = async (req, res) => {
     );
     res.status(204).send({message: "File deleted successfully"});
   } catch (error) {
-    res.status(error.status).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -85,7 +81,7 @@ export const deleteAllFilesByPath = async (req, res) => {
     await fileServices.deleteAllFilesByPath(path);
     res.status(204).send();
   } catch (error) {
-    res.status(error.status).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
