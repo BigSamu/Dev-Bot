@@ -21,7 +21,6 @@ export const getFileByPath = async (octokit, owner, repo, branch, path) => {
     if (Array.isArray(data)) {
       throw new Error("The provided path is a directory, not a file.");
     }
-
     return {
       name: data.name,
       path: data.path,
@@ -34,7 +33,7 @@ export const getFileByPath = async (octokit, owner, repo, branch, path) => {
       console.log(`File '${path}' not found.`);
       return;
     } else {
-      console.error("Error fetching file:", error);
+      console.error("Error fetching file:", error.message);
       throw error;
     }
   }
@@ -83,7 +82,7 @@ export const getAllFilesByPath = async (
         sha: file.sha,
       }));
   } catch (error) {
-    console.error("Error fetching directory contents:", error);
+    console.error("Error fetching directory contents:", error.message);
     throw error;
   }
 };
@@ -98,7 +97,6 @@ export const getAllFilesByPath = async (
  * @param {string} path - The file path.
  * @param {string} content - The file content.
  * @param {string} message - The commit message.
- * @param {string} sha - The file SHA.
  * @returns {Promise<object>} - An object containing the created or updated file details.
  * @throws {Error} - If an error occurs while creating or updating the file.
  */
@@ -109,28 +107,32 @@ export const createOrUpdateFileByPath = async (
   branch,
   path,
   content,
-  message,
-  sha
+  message
 ) => {
   try {
+    const changesetFile = await getFileByPath(
+      octokit,
+      owner,
+      repo,
+      branch,
+      path
+    );
+    const sha = changesetFile ? changesetFile.sha : null;
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: owner,
       repo: repo,
       branch: branch,
       path: path,
-      message: message,
+      message: message(sha),
       content: Buffer.from(content).toString("base64"),
       sha: sha,
     });
     // Log the message determined by the calling function
-    console.log(message);
+    console.log(message(sha));
   } catch (error) {
     // Determine the operation based on the presence of a SHA
     const operation = sha ? "updating" : "creating";
-    console.error(
-      `Error ${operation} file '${path}': `, 
-      error.message
-    );
+    console.error(`Error ${operation} file '${path}':`, error.message);
     throw error;
   }
 };
@@ -144,7 +146,6 @@ export const createOrUpdateFileByPath = async (
  * @param {string} branch - The branch name.
  * @param {string} path - The file path.
  * @param {string} message - The commit message.
- * @param {string} sha - The file SHA.
  * @returns {Promise<void>} A Promise that resolves when the file is deleted.
  * @throws {Error} - If an error occurs while deleting the file.
  */
@@ -154,25 +155,31 @@ export const deleteFileByPath = async (
   repo,
   branch,
   path,
-  message,
-  sha
+  message
 ) => {
   try {
-    await octokit.rest.repos.deleteFile({
-      owner: owner,
-      repo: repo,
-      path: path,
-      message: message,
-      sha: sha,
-      branch: branch,
-    });
-    console.log(`File '${path}' deleted successfully.`);
-  } catch (error) {
-    if(error.status === 404 || error.status === 422) {
-      console.log(`File '${path}' not found. No need to delete file.`);
-      return;
+    const changesetFile = await getFileByPath(
+      octokit,
+      owner,
+      repo,
+      branch,
+      path
+    );
+    if (changesetFile) {
+      await octokit.rest.repos.deleteFile({
+        owner: owner,
+        repo: repo,
+        path: path,
+        message: message,
+        sha: changesetFile.sha,
+        branch: branch,
+      });
+      console.log(message);
+    } else {
+      console.log(`No file to delete.`);
     }
-    console.error("Error deleting file:", error);
+  } catch (error) {
+    console.error("Error deleting file:", error.message);
     throw error;
   }
 };
@@ -244,7 +251,7 @@ export async function deleteAllFilesByPath(
 
     console.log(`All files in ${directoryPath} deleted successfully.`);
   } catch (error) {
-    console.error("Error deleting all files:", error);
+    console.error("Error deleting all files:", error.message);
     throw error;
   }
 }
