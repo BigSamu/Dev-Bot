@@ -97,7 +97,6 @@ export const getAllFilesByPath = async (
  * @param {string} path - The file path.
  * @param {string} content - The file content.
  * @param {string} message - The commit message.
- * @param {string} sha - The file SHA.
  * @returns {Promise<object>} - An object containing the created or updated file details.
  * @throws {Error} - If an error occurs while creating or updating the file.
  */
@@ -147,7 +146,6 @@ export const createOrUpdateFileByPath = async (
  * @param {string} branch - The branch name.
  * @param {string} path - The file path.
  * @param {string} message - The commit message.
- * @param {string} sha - The file SHA.
  * @returns {Promise<void>} A Promise that resolves when the file is deleted.
  * @throws {Error} - If an error occurs while deleting the file.
  */
