@@ -9,7 +9,7 @@
  * @returns {Promise<Object>} A Promise that resolves with the label data.
  * @throws {Error} - If an error occurs while retrieving the label.
  */
-export const getOneLabel = async (
+const getLabel = async (
   octokit,
   owner,
   repo,
@@ -46,7 +46,7 @@ export const getOneLabel = async (
  * @returns {Promise<void>} A Promise that resolves when the label is added.
  * @throws {Error} - If an error occurs while adding the label.
  */
-export const addLabel = async (
+const addLabel = async (
   octokit,
   owner,
   repo,
@@ -82,7 +82,7 @@ export const addLabel = async (
  * @returns {Promise<void>} A Promise that resolves when the label is removed.
  * @throws {Error} - If an error occurs while removing the label.
  */
-export const removeLabel = async (
+const removeLabel = async (
   octokit,
   owner,
   repo,
@@ -109,4 +109,10 @@ export const removeLabel = async (
     console.error("Error removing label:", error.message);
     throw error;
   }
+};
+
+export const labelServices = {
+  getLabel,
+  addLabel,
+  removeLabel,
 };

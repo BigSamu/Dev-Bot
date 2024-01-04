@@ -9,7 +9,7 @@
  * @returns {Promise<void>} A Promise that resolves when the comment is posted.
  * @throws {Error} - If an error occurs while posting the comment.
  */
-export async function postComment(octokit, owner, repo, issueOrPullRequestNumber, comment) {
+async function postComment(octokit, owner, repo, issueOrPullRequestNumber, comment) {
   try {
     // Create the comment on the issue or pull request
     await octokit.rest.issues.createComment({
@@ -24,4 +24,8 @@ export async function postComment(octokit, owner, repo, issueOrPullRequestNumber
     console.error("Error posting comment:", error.message);
     throw error;
   }
+}
+
+export const commentServices = {
+  postComment,
 }
