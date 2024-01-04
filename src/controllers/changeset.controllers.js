@@ -5,7 +5,6 @@ import {
 } from "../config/constants.js";
 
 import {
-  getFileByPath,
   createOrUpdateFileByPath,
   deleteFileByPath,
   addLabel,
