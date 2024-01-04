@@ -123,12 +123,13 @@ const createOrUpdateFileByPath = async (
       repo: repo,
       branch: branch,
       path: path,
-      message: message(sha),
+      message: message,
       content: Buffer.from(content).toString("base64"),
       sha: sha,
     });
     // Log the message determined by the calling function
-    console.log(message(sha));
+    console.log(message);
+    return { message: message };
   } catch (error) {
     // Determine the operation based on the presence of a SHA
     const operation = sha ? "updating" : "creating";
@@ -174,10 +175,9 @@ const deleteFileByPath = async (
         sha: changesetFile.sha,
         branch: branch,
       });
-      console.log(message);
-    } else {
-      console.log(`No file to delete.`);
     }
+    console.log(changesetFile ? message : "No file to delete.");
+    return { message: changesetFile ? message : "No file to delete." };
   } catch (error) {
     console.error("Error deleting file:", error.message);
     throw error;
@@ -262,4 +262,4 @@ export const fileServices = {
   createOrUpdateFileByPath,
   deleteFileByPath,
   deleteAllFilesByPath,
-}
+};
