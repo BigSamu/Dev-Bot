@@ -1,6 +1,6 @@
 import { fileServices, authServices } from "../services/index.js";
 
-export const getFileByPath = async (req, res) => {
+const getFileByPath = async (req, res, next) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const octokit = await authServices.getOcktokitClient(owner, repo);
@@ -13,11 +13,11 @@ export const getFileByPath = async (req, res) => {
     );
     res.json(file);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+      next(error);
   }
 };
 
-export const getAllFileByPath = async (req, res) => {
+const getAllFileByPath = async (req, res, next) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const octokit = await authServices.getOcktokitClient(owner, repo);
@@ -30,11 +30,11 @@ export const getAllFileByPath = async (req, res) => {
     );
     res.json(files);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const createOrUpdateFile = async (req, res) => {
+const createOrUpdateFile = async (req, res, next) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const { content, message } = req.body;
@@ -51,11 +51,11 @@ export const createOrUpdateFile = async (req, res) => {
     );
     res.status(201).json({message: "File created/updated successfully"});
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const deleteFileByPath = async (req, res) => {
+const deleteFileByPath = async (req, res, next) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const { message } = req.body;
@@ -70,17 +70,17 @@ export const deleteFileByPath = async (req, res) => {
     );
     res.status(204).send({message: "File deleted successfully"});
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-export const deleteAllFilesByPath = async (req, res) => {
+const deleteAllFilesByPath = async (req, res, next) => {
   try {
     const { path } = req.query;
     await fileServices.deleteAllFilesByPath(path);
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 

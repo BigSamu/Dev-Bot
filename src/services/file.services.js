@@ -130,9 +130,8 @@ const createOrUpdateFileByPath = async (
     console.log(message);
     return { message: message };
   } catch (error) {
-    // Determine the operation based on the presence of a SHA
-    // console.error(`Error creating/updating file '${path}':`, error.message);
-    console.error(error);
+    
+    console.error(`Error creating/updating file '${path}':`, error.message);
     throw error;
   }
 };
