@@ -38,7 +38,6 @@ export const createOrUpdateFile = async (req, res) => {
   try {
     const { owner, repo, branch, path } = req.query;
     const { content, message } = req.body;
-    console.log(owner, repo, branch, path, content, message)
     const decodedContent = Buffer.from(content, "base64").toString("utf-8");
     const octokit = await authServices.getOcktokitClient(owner, repo);
     await fileServices.createOrUpdateFileByPath(

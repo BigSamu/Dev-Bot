@@ -21,7 +21,7 @@ const getOcktokitClient = async (owner, repo) => {
       privateKey: GITHUB_APP_PRIVATE_KEY,
     });
     const { data: installation } = await ghApp.octokit.request(
-      `GET /repos/{owner}/{repo}/installation`,
+      `GET /repos/${owner}/${repo}/installation`,
       { owner, repo }
     );
     return ghApp.getInstallationOctokit(installation.id);

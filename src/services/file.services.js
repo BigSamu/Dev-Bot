@@ -29,6 +29,10 @@ const getFileByPath = async (octokit, owner, repo, branch, path) => {
       sha: data.sha,
     };
   } catch (error) {
+    if(error.status === 404) {
+      console.log(`File '${path}' not found.`);
+      return;
+    }
     console.error("Error fetching file:", error.message);
     throw error;
   }
@@ -112,7 +116,7 @@ const createOrUpdateFileByPath = async (
       branch,
       path
     );
-    const sha = changesetFile ? changesetFile.sha : undefined;
+    // const sha = changesetFile ? changesetFile.sha : undefined;
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: owner,
       repo: repo,
@@ -120,14 +124,15 @@ const createOrUpdateFileByPath = async (
       path: path,
       message: message,
       content: Buffer.from(content).toString("base64"),
-      sha: sha,
+      sha: changesetFile?.sha,
     });
     // Log the message determined by the calling function
     console.log(message);
     return { message: message };
   } catch (error) {
     // Determine the operation based on the presence of a SHA
-    console.error(`Error creating/updating file '${path}':`, error.message);
+    // console.error(`Error creating/updating file '${path}':`, error.message);
+    console.error(error);
     throw error;
   }
 };
