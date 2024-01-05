@@ -11,9 +11,9 @@ const getFileByPath = async (req, res, next) => {
       branch,
       path
     );
-    res.json(file);
+    res.json({ data: file });
   } catch (error) {
-      next(error);
+    next(error);
   }
 };
 
@@ -28,7 +28,7 @@ const getAllFileByPath = async (req, res, next) => {
       branch,
       path
     );
-    res.json(files);
+    res.json({ data: files });
   } catch (error) {
     next(error);
   }
@@ -49,7 +49,7 @@ const createOrUpdateFile = async (req, res, next) => {
       decodedContent,
       message
     );
-    res.status(201).json({message: "File created/updated successfully"});
+    res.status(201).json({ message: "File created/updated successfully" });
   } catch (error) {
     next(error);
   }
@@ -68,7 +68,7 @@ const deleteFileByPath = async (req, res, next) => {
       path,
       message
     );
-    res.status(204).send({message: "File deleted successfully"});
+    res.status(204).json({ message: "File deleted successfully" });
   } catch (error) {
     next(error);
   }
@@ -78,7 +78,7 @@ const deleteAllFilesByPath = async (req, res, next) => {
   try {
     const { path } = req.query;
     await fileServices.deleteAllFilesByPath(path);
-    res.status(204).send();
+    res.status(204).json({ message: "All files deleted successfully" });
   } catch (error) {
     next(error);
   }
