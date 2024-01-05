@@ -1,9 +1,8 @@
-
-import { App } from 'octokit';
-import{
+import { App } from "octokit";
+import {
   GITHUB_APP_IDENTIFIER,
   GITHUB_APP_PRIVATE_KEY,
-} from '../config/constants.js';
+} from "../config/constants.js";
 /**
  * Creates an authenticated Octokit instance for a given GitHub App installation.
  * This function performs asynchronous operations to obtain the installation ID and
@@ -26,11 +25,14 @@ const getOcktokitClient = async (owner, repo) => {
     );
     return ghApp.getInstallationOctokit(installation.id);
   } catch (error) {
-    console.error('Error in getOcktokitClient:', error.message);
+    console.error(
+      `Error getting Ocktokit client for owner '${owner}' and repo '${repo}'`,
+      error.message
+    );
     throw error; // Re-throw the error to propagate it to the caller.
   }
 };
 
 export const authServices = {
   getOcktokitClient,
-}
+};
