@@ -6,6 +6,11 @@ import express from "express";
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 
 import releaseNotesRouter from "./routes/releaseNotes.routes.js";
+import fileRouter from "./routes/file.routes.js";
+import {
+  errorRequestHandler,
+  ensureGitHubAppInstalled,
+} from "./middlewares/index.js";
 
 import {
   GITHUB_APP_WEBHOOK_SECRET,
@@ -35,10 +40,17 @@ app.use(express.urlencoded({ extended: true }));
 // 5) Setup webhook events handlers
 setupWebhooks(webhooks, webhookUrl);
 
-// 6) Suscribe API routes
-app.use(API_PATH_SUFFIX, releaseNotesRouter);
+// 6) Ensure GitHub App is installed in the repository
+app.use(ensureGitHubAppInstalled);
 
-// 7) Running instance of Express server in selected port
+// 7) Suscribe API routes
+app.use(API_PATH_SUFFIX, releaseNotesRouter);
+app.use(API_PATH_SUFFIX, fileRouter);
+
+// 8) Setup error handlers middlewares for requests
+app.use(errorRequestHandler);
+
+// 9) Running instance of Express server in selected port
 app.listen(PORT, () => {
   console.log(`Server is listening in port: ${PORT}`);
   console.log("Press Ctrl + C to quit.");

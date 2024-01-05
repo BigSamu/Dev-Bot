@@ -9,7 +9,7 @@
  * @returns {Promise<object>} - An object containing the file details.
  * @throws {Error} - If an error occurs while fetching the file.
  */
-export const getFileByPath = async (octokit, owner, repo, branch, path) => {
+const getFileByPath = async (octokit, owner, repo, branch, path) => {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner: owner,
@@ -29,13 +29,12 @@ export const getFileByPath = async (octokit, owner, repo, branch, path) => {
       sha: data.sha,
     };
   } catch (error) {
-    if (error.status === 404) {
+    if(error.status === 404) {
       console.log(`File '${path}' not found.`);
       return;
-    } else {
-      console.error("Error fetching file:", error.message);
-      throw error;
     }
+    console.error("Error fetching file:", error.message);
+    throw error;
   }
 };
 
@@ -52,7 +51,7 @@ export const getFileByPath = async (octokit, owner, repo, branch, path) => {
  *
  */
 
-export const getAllFilesByPath = async (
+const getAllFilesByPath = async (
   octokit,
   owner,
   repo,
@@ -100,7 +99,7 @@ export const getAllFilesByPath = async (
  * @returns {Promise<object>} - An object containing the created or updated file details.
  * @throws {Error} - If an error occurs while creating or updating the file.
  */
-export const createOrUpdateFileByPath = async (
+const createOrUpdateFileByPath = async (
   octokit,
   owner,
   repo,
@@ -117,22 +116,22 @@ export const createOrUpdateFileByPath = async (
       branch,
       path
     );
-    const sha = changesetFile ? changesetFile.sha : null;
+    // const sha = changesetFile ? changesetFile.sha : undefined;
     await octokit.rest.repos.createOrUpdateFileContents({
       owner: owner,
       repo: repo,
       branch: branch,
       path: path,
-      message: message(sha),
+      message: message,
       content: Buffer.from(content).toString("base64"),
-      sha: sha,
+      sha: changesetFile?.sha,
     });
     // Log the message determined by the calling function
-    console.log(message(sha));
+    console.log(message);
+    return { message: message };
   } catch (error) {
-    // Determine the operation based on the presence of a SHA
-    const operation = sha ? "updating" : "creating";
-    console.error(`Error ${operation} file '${path}':`, error.message);
+    
+    console.error(`Error creating/updating file '${path}':`, error.message);
     throw error;
   }
 };
@@ -149,7 +148,7 @@ export const createOrUpdateFileByPath = async (
  * @returns {Promise<void>} A Promise that resolves when the file is deleted.
  * @throws {Error} - If an error occurs while deleting the file.
  */
-export const deleteFileByPath = async (
+const deleteFileByPath = async (
   octokit,
   owner,
   repo,
@@ -174,10 +173,9 @@ export const deleteFileByPath = async (
         sha: changesetFile.sha,
         branch: branch,
       });
-      console.log(message);
-    } else {
-      console.log(`No file to delete.`);
     }
+    console.log(changesetFile ? message : "No file to delete.");
+    return { message: changesetFile ? message : "No file to delete." };
   } catch (error) {
     console.error("Error deleting file:", error.message);
     throw error;
@@ -196,7 +194,7 @@ export const deleteFileByPath = async (
  * @returns {Promise<void>} A Promise that resolves when all files are deleted.
  * @throws {Error} - If an error occurs while deleting all files.
  */
-export async function deleteAllFilesByPath(
+async function deleteAllFilesByPath(
   octokit,
   owner,
   repo,
@@ -255,3 +253,11 @@ export async function deleteAllFilesByPath(
     throw error;
   }
 }
+
+export const fileServices = {
+  getFileByPath,
+  getAllFilesByPath,
+  createOrUpdateFileByPath,
+  deleteFileByPath,
+  deleteAllFilesByPath,
+};

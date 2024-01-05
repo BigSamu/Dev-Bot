@@ -5,12 +5,10 @@ import {
 } from "../config/constants.js";
 
 import {
-  createOrUpdateFileByPath,
-  deleteFileByPath,
-  addLabel,
-  removeLabel,
-  postComment,
-  getOcktokitClient,
+  fileServices,
+  labelServices,
+  commentServices,
+  authServices,
 } from "../services/index.js";
 
 import {
@@ -50,8 +48,8 @@ export const createOrUpdateChangesetFile = async (payload) => {
       prLink,
     } = extractPullRequestData(payload.pull_request));
 
-    baseOctokit = await getOcktokitClient(baseOwner, baseRepo);
-    headOctokit = await getOcktokitClient(headOwner, headRepo);
+    baseOctokit = await authServices.getOcktokitClient(baseOwner, baseRepo);
+    headOctokit = await authServices.getOcktokitClient(headOwner, headRepo);
 
     // Step 1 - Parse changelog entries and validate
     const changelogEntries = extractChangelogEntries(
@@ -67,11 +65,11 @@ export const createOrUpdateChangesetFile = async (payload) => {
     // Step 2 - Handle "skip" option
 
     if (isSkipEntry(changesetEntriesMap)) {
-      await addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
+      await fileServices.addLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
 
       // Delete changeset file if one was previously created
       const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-      await deleteFileByPath(
+      await fileServices.deleteFileByPath(
         headOctokit,
         headOwner,
         headRepo,
@@ -81,7 +79,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
       );
 
       // Clear 'failed changeset' label if exists
-      await removeLabel(
+      await fileServices.removeLabel(
         baseOctokit,
         baseOwner,
         baseRepo,
@@ -98,7 +96,7 @@ export const createOrUpdateChangesetFile = async (payload) => {
       `Changeset file for PR #${prNumber} ${
         changesetFileSha ? "updated" : "created"
       }`;
-    await createOrUpdateFileByPath(
+    await fileServices.createOrUpdateFileByPath(
       headOctokit,
       headOwner,
       headRepo,
@@ -109,8 +107,8 @@ export const createOrUpdateChangesetFile = async (payload) => {
     );
 
     // Step 4 - Remove "Skip-Changelog" and "failed changeset" labels if they exist
-    await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
-    await removeLabel(
+    await fileServices.removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
+    await fileServices.removeLabel(
       baseOctokit,
       baseOwner,
       baseRepo,
@@ -118,11 +116,13 @@ export const createOrUpdateChangesetFile = async (payload) => {
       FAILED_CHANGESET_LABEL
     );
   } catch (error) {
+    
+    console.error(error);
     const changesetFilePath = `${CHANGESET_PATH}/${prNumber}.yml`;
 
     // Delete changeset file if one was previously created
     const commitMessage = `Changeset file for PR #${prNumber} deleted`;
-    await deleteFileByPath(
+    await fileServices.deleteFileByPath(
       headOctokit,
       headOwner,
       headRepo,
@@ -133,9 +133,9 @@ export const createOrUpdateChangesetFile = async (payload) => {
 
     const errorComment = formatPostComment({ input: error, type: "ERROR" });
     // Add error comment to PR
-    await postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
+    await fileServices.postComment(baseOctokit, baseOwner, baseRepo, prNumber, errorComment);
     // Add failed changeset label
-    await addLabel(
+    await fileServices.addLabel(
       baseOctokit,
       baseOwner,
       baseRepo,
@@ -143,6 +143,6 @@ export const createOrUpdateChangesetFile = async (payload) => {
       FAILED_CHANGESET_LABEL
     );
     // Clear skip label if exists
-    await removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
+    await fileServices.removeLabel(baseOctokit, baseOwner, baseRepo, prNumber, SKIP_LABEL);
   }
 };
